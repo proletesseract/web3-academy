@@ -1,0 +1,71 @@
+{
+  "lessonId": "passport-integration-basics",
+  "version": "1.0.0",
+  "title": "Immutable Passport Integration Basics",
+  "description": "Learn how to integrate Immutable Passport authentication into your Next.js application",
+  "author": "Immutable Academy",
+  "tags": ["authentication", "passport", "web3", "nextjs"],
+  "difficulty": "beginner",
+  "timeToComplete": "40 minutes",
+  "steps": [
+    {
+      "id": "01",
+      "title": "Introduction to Immutable Passport",
+      "contentFile": "steps/01/content.md",
+      "codeFile": "steps/01/code.ts",
+      "isCodeRequired": false
+    },
+    {
+      "id": "02",
+      "title": "Setting Up the Immutable SDK",
+      "contentFile": "steps/02/content.md",
+      "codeFile": "steps/02/code.ts",
+      "isCodeRequired": true,
+      "context": {
+        "hint": "Make sure to include all the necessary configuration options for Passport."
+      }
+    },
+    {
+      "id": "03",
+      "title": "Creating a Passport Client",
+      "contentFile": "steps/03/content.md",
+      "codeFile": "steps/03/code.ts",
+      "isCodeRequired": true,
+      "context": {
+        "hint": "Initialize the Passport client with the correct configuration options."
+      }
+    },
+    {
+      "id": "04",
+      "title": "Implementing User Login",
+      "contentFile": "steps/04/content.md",
+      "codeFile": "steps/04/code.ts",
+      "isCodeRequired": true,
+      "context": {
+        "hint": "Be sure to handle the redirect from Passport correctly in the callback page."
+      }
+    }
+  ],
+  "starter": {
+    "description": "A basic Next.js project with the necessary dependencies installed",
+    "directory": "starter"
+  },
+  "complete": {
+    "description": "The complete implementation of the Immutable Passport integration",
+    "directory": "complete"
+  },
+  "resources": [
+    {
+      "title": "Immutable Passport Documentation",
+      "url": "https://docs.immutable.com/"
+    },
+    {
+      "title": "Immutable TypeScript SDK",
+      "url": "https://github.com/immutable/ts-immutable-sdk"
+    },
+    {
+      "title": "Passport Examples",
+      "url": "https://github.com/immutable/ts-immutable-sdk/tree/main/examples/passport"
+    }
+  ]
+} 

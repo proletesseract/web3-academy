@@ -1,0 +1,71 @@
+{
+  "courseId": "immutable-passport",
+  "version": "1.0.0",
+  "title": "Immutable Passport Development",
+  "description": "Learn how to integrate and utilize Immutable Passport in your Next.js applications for Web3 authentication and blockchain interactions",
+  "author": "Immutable Academy",
+  "tags": ["authentication", "passport", "web3", "nextjs", "blockchain"],
+  "difficulty": "intermediate",
+  "estimatedTime": "4 hours",
+  "lessons": [
+    {
+      "id": "01",
+      "path": "01",
+      "title": "Immutable Passport Integration Basics",
+      "description": "Learn how to integrate Immutable Passport authentication into your Next.js application",
+      "difficulty": "beginner",
+      "timeToComplete": "40 minutes"
+    },
+    {
+      "id": "02",
+      "path": "02",
+      "title": "Managing User Sessions",
+      "description": "Implement persistent user sessions and handle authentication state",
+      "difficulty": "beginner",
+      "timeToComplete": "45 minutes",
+      "comingSoon": true
+    },
+    {
+      "id": "03",
+      "path": "03",
+      "title": "Connecting to Immutable zkEVM",
+      "description": "Use Passport to connect to Immutable zkEVM and interact with smart contracts",
+      "difficulty": "intermediate",
+      "timeToComplete": "60 minutes",
+      "comingSoon": true
+    },
+    {
+      "id": "04",
+      "path": "04",
+      "title": "Advanced Passport Features",
+      "description": "Implement advanced features like transaction signing and wallet management",
+      "difficulty": "advanced",
+      "timeToComplete": "90 minutes",
+      "comingSoon": true
+    }
+  ],
+  "prerequisites": [
+    {
+      "title": "Basic Next.js Knowledge",
+      "description": "Understanding of Next.js fundamentals including routing and components"
+    },
+    {
+      "title": "TypeScript Fundamentals",
+      "description": "Familiarity with TypeScript syntax and type definitions"
+    }
+  ],
+  "resources": [
+    {
+      "title": "Immutable Passport Documentation",
+      "url": "https://docs.immutable.com/"
+    },
+    {
+      "title": "Immutable TypeScript SDK",
+      "url": "https://github.com/immutable/ts-immutable-sdk"
+    },
+    {
+      "title": "Immutable zkEVM Documentation",
+      "url": "https://docs.immutable.com/docs/zkEVM/"
+    }
+  ]
+} 
