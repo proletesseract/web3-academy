@@ -31,6 +31,7 @@ export default function CoursesPage() {
         }
         
         const data = await response.json();
+        // Always initialize with fresh data
         initializeCourses(data.courses);
       } catch (err) {
         console.error('Error fetching courses:', err);
@@ -40,20 +41,16 @@ export default function CoursesPage() {
       }
     }
     
-    // Only fetch if no courses exist
-    if (courses.length === 0) {
-      fetchCourses();
-    } else {
-      setLoading(false);
-    }
-  }, [courses.length, initializeCourses]);
+    // Always fetch fresh data
+    fetchCourses();
+  }, [initializeCourses]);
   
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto p-6 flex justify-center items-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading courses...</p>
+          <p className="text-gray-300">Loading courses...</p>
         </div>
       </div>
     );
@@ -77,7 +74,7 @@ export default function CoursesPage() {
   
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Available Courses</h1>
+      <h1 className="text-3xl font-bold mb-8 text-white">Available Courses</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
@@ -104,7 +101,7 @@ export default function CoursesPage() {
               )}
             </div>
             <div className="p-6">
-              <h2 className="text-xl font-bold mb-2">{course.title}</h2>
+              <h2 className="text-xl font-bold mb-2 text-gray-900">{course.title}</h2>
               <p className="text-gray-600 mb-4">{course.description}</p>
               <div className="flex justify-between items-center mb-4">
                 <div className="text-sm text-gray-500">

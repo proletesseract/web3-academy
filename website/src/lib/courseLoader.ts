@@ -207,9 +207,9 @@ async function loadStep(lessonPath: string, stepInfo: StepInfo): Promise<LessonS
     ? fs.readFileSync(contentPath, 'utf-8') 
     : '# Content coming soon';
   
-  // Read code if available
+  // Read code if available and required
   let codeChallenge;
-  if (fs.existsSync(codePath)) {
+  if (stepInfo.isCodeRequired && fs.existsSync(codePath)) {
     const code = fs.readFileSync(codePath, 'utf-8');
     codeChallenge = {
       defaultCode: code,

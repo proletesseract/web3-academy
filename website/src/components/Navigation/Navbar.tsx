@@ -8,12 +8,12 @@ const Navbar: React.FC = () => {
   const pathname = usePathname();
   
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-black/70 backdrop-blur-sm shadow-lg">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold text-blue-600">
+              <Link href="/" className="text-xl font-bold text-blue-400">
                 Immutable Academy
               </Link>
             </div>
@@ -22,8 +22,8 @@ const Navbar: React.FC = () => {
                 href="/courses" 
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   pathname.startsWith('/courses') 
-                    ? 'border-blue-500 text-gray-900' 
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    ? 'border-blue-500 text-white' 
+                    : 'border-transparent text-gray-300 hover:border-gray-400 hover:text-white'
                 }`}
               >
                 Courses
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
                 href="https://docs.immutable.com/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-300 hover:border-gray-400 hover:text-white"
               >
                 Documentation
               </a>
@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
                 href="https://github.com/immutable"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-300 hover:text-white"
               >
                 GitHub
               </a>
@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
                 href="https://discord.gg/immutablex"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-300 hover:text-white"
               >
                 Discord
               </a>
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center sm:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>

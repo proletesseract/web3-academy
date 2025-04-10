@@ -26,7 +26,7 @@ export default function LessonPage() {
       <div className="max-w-screen-2xl mx-auto">
         <div className="p-6 text-center">
           <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent mx-auto"></div>
-          <p className="mt-4">Loading lesson...</p>
+          <p className="mt-4 text-gray-300">Loading lesson...</p>
         </div>
       </div>
     );
@@ -38,7 +38,7 @@ export default function LessonPage() {
         <div className="p-4">
           <Link 
             href="/courses" 
-            className="text-blue-600 hover:underline inline-flex items-center"
+            className="text-blue-400 hover:underline inline-flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -47,8 +47,8 @@ export default function LessonPage() {
           </Link>
         </div>
         <div className="p-6 text-center">
-          <h1 className="text-3xl font-bold mb-4">Lesson Not Found</h1>
-          <p className="mb-6">The lesson you are looking for does not exist.</p>
+          <h1 className="text-3xl font-bold mb-4 text-white">Lesson Not Found</h1>
+          <p className="mb-6 text-gray-300">The lesson you are looking for does not exist.</p>
           <Link 
             href="/courses" 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -86,7 +86,7 @@ export default function LessonPage() {
       <div className="p-4">
         <Link 
           href="/courses" 
-          className="text-blue-600 hover:underline inline-flex items-center"
+          className="text-blue-400 hover:underline inline-flex items-center"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
