@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import useLessonStore from '../../../store/lessonStore';
 import Link from 'next/link';
@@ -9,9 +9,27 @@ export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const courseId = params.courseId as string;
+  const [isLoading, setIsLoading] = useState(true);
   
   const { getCourseById, setCurrentLesson } = useLessonStore();
   const course = getCourseById(courseId);
+  
+  // Ensure consistent rendering between server and client
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+  
+  // Show loading state during hydration to prevent mismatch
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="p-6 text-center">
+          <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent mx-auto"></div>
+          <p className="mt-4">Loading course...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!course) {
     return (

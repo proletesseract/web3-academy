@@ -8,6 +8,9 @@ interface Course {
   description: string;
   image?: string;
   lessons: Lesson[];
+  difficulty?: string;
+  prerequisites?: { title: string; description: string }[];
+  resources?: { title: string; url: string }[];
 }
 
 interface Lesson {

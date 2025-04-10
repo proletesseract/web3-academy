@@ -8,6 +8,7 @@ interface CodeEditorProps {
   onChange?: (value: string | undefined) => void;
   onValidate?: (isValid: boolean) => void;
   validateCode?: (code: string) => boolean;
+  className?: string;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
@@ -17,6 +18,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onChange,
   onValidate,
   validateCode,
+  className = '',
 }) => {
   const handleEditorChange = (value: string | undefined) => {
     if (onChange) {
@@ -30,9 +32,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   };
 
   return (
-    <div className="border border-gray-300 rounded-md overflow-hidden">
+    <div 
+      className={`border border-gray-300 rounded-md overflow-hidden ${className}`} 
+      style={{ height: '100%', width: '100%' }}
+    >
       <Editor
-        height={height}
+        height="100%"
+        width="100%"
         defaultLanguage={language}
         defaultValue={defaultValue}
         onChange={handleEditorChange}

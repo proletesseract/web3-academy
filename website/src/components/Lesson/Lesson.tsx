@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CodeEditor from '../CodeEditor/CodeEditor';
 import Quiz, { QuizQuestion } from '../Quiz/Quiz';
@@ -30,6 +30,15 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [codeByStep, setCodeByStep] = useState<Record<string, string>>({});
   const [stepCompleted, setStepCompleted] = useState<Record<string, boolean>>({});
+  const [windowHeight, setWindowHeight] = useState(0);
+  
+  // Get window height on mount
+  useEffect(() => {
+    setWindowHeight(window.innerHeight);
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const currentStep = lesson.steps[currentStepIndex];
   
@@ -75,12 +84,15 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   
   const isCurrentStepCompleted = stepCompleted[currentStep.id] || false;
   
+  // Calculate content height based on window height, minus headers and footers
+  const contentHeight = windowHeight - 220; // 220px accounts for headers, footers, margins
+  
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-full px-4">
       <h1 className="text-3xl font-bold mb-2">{lesson.title}</h1>
       <p className="text-gray-600 mb-6">{lesson.description}</p>
       
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center mb-4">
           <div className="flex-1 h-2 bg-gray-200 rounded-full">
             <div 
@@ -97,34 +109,47 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-2xl font-bold mb-4">{currentStep.title}</h2>
         
-        <div className="prose max-w-none mb-6">
-          <ReactMarkdown>{currentStep.content}</ReactMarkdown>
+        <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 435px)` }}>
+          {/* Left side: Instructions/Content */}
+          <div className="lg:w-1/2 h-full overflow-auto pr-3">
+            <div className="prose max-w-none mb-6">
+              <ReactMarkdown>{currentStep.content}</ReactMarkdown>
+            </div>
+            
+            {currentStep.quiz && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-2">Quiz</h3>
+                <Quiz 
+                  questions={currentStep.quiz} 
+                  onComplete={(score, total) => handleQuizComplete(currentStep.id, score, total)}
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Right side: Code Editor */}
+          {currentStep.codeChallenge ? (
+            <div className="lg:w-1/2 h-full flex flex-col">
+              <h3 className="text-xl font-semibold mb-2">Code Challenge</h3>
+              <div className="flex-grow" style={{ height: 'calc(100% - 32px)' }}>
+                <CodeEditor 
+                  defaultValue={currentStep.codeChallenge.defaultCode}
+                  language={currentStep.codeChallenge.language || 'typescript'}
+                  onChange={(code) => handleCodeChange(currentStep.id, code)}
+                  onValidate={(isValid) => handleCodeValidation(currentStep.id, isValid)}
+                  validateCode={(code) => validateCode(code, currentStep.codeChallenge?.solution || '')}
+                  height="100%"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="lg:w-1/2 flex items-center justify-center bg-gray-50 rounded-lg h-full">
+              <p className="text-gray-500">This step doesn't have a coding challenge.</p>
+            </div>
+          )}
         </div>
         
-        {currentStep.codeChallenge && (
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Code Challenge</h3>
-            <CodeEditor 
-              defaultValue={currentStep.codeChallenge.defaultCode}
-              language={currentStep.codeChallenge.language}
-              onChange={(code) => handleCodeChange(currentStep.id, code)}
-              onValidate={(isValid) => handleCodeValidation(currentStep.id, isValid)}
-              validateCode={(code) => validateCode(code, currentStep.codeChallenge?.solution || '')}
-            />
-          </div>
-        )}
-        
-        {currentStep.quiz && (
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Quiz</h3>
-            <Quiz 
-              questions={currentStep.quiz} 
-              onComplete={(score, total) => handleQuizComplete(currentStep.id, score, total)}
-            />
-          </div>
-        )}
-        
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-4">
           <button
             onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
             disabled={currentStepIndex === 0}
