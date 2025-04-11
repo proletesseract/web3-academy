@@ -65,6 +65,70 @@
       "context": {
         "hint": "Be sure to handle the redirect from Passport correctly in the callback page."
       }
+    },
+    {
+      "id": "05",
+      "title": "Knowledge Check",
+      "contentFile": "steps/05/content.md",
+      "codeFile": "steps/05/code-start.ts",
+      "isCodeRequired": false,
+      "quiz": [
+        {
+          "id": "q1",
+          "question": "What is the primary purpose of Immutable Passport?",
+          "options": [
+            "To provide a secure authentication and wallet solution for web3 applications",
+            "To create and manage NFTs",
+            "To handle blockchain transactions only",
+            "To store user data"
+          ],
+          "correctAnswer": "To provide a secure authentication and wallet solution for web3 applications"
+        },
+        {
+          "id": "q2",
+          "question": "Which configuration option is required for identifying your application to Immutable's services?",
+          "options": [
+            "redirectUri",
+            "clientId",
+            "environment",
+            "scope"
+          ],
+          "correctAnswer": "clientId"
+        },
+        {
+          "id": "q3",
+          "question": "What is the purpose of the 'scope' configuration in Passport?",
+          "options": [
+            "To define the application's visual boundaries",
+            "To specify which permissions your application is requesting",
+            "To set the geographical region for the application",
+            "To limit the number of users"
+          ],
+          "correctAnswer": "To specify which permissions your application is requesting"
+        },
+        {
+          "id": "q4",
+          "question": "Which environment should you use for development and testing?",
+          "options": [
+            "PRODUCTION",
+            "SANDBOX",
+            "TEST",
+            "DEV"
+          ],
+          "correctAnswer": "SANDBOX"
+        },
+        {
+          "id": "q5",
+          "question": "What is the purpose of the 'audience' configuration in Passport?",
+          "options": [
+            "To specify which API the authentication token is intended for",
+            "To define the target user base",
+            "To set the application's visibility",
+            "To control access levels"
+          ],
+          "correctAnswer": "To specify which API the authentication token is intended for"
+        }
+      ]
     }
   ],
   "starter": {

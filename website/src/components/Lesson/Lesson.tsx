@@ -415,6 +415,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           <button
             onClick={resetLesson}
             className="btn-immutable-tiny-inverted"
+             style={{ marginLeft: '10px'}}
           >
             Reset Lesson
           </button>
@@ -446,19 +447,9 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
                 {currentStep.content}
               </ReactMarkdown>
             </div>
-            
-            {currentStep.quiz && (
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">Quiz</h3>
-                <Quiz 
-                  questions={currentStep.quiz} 
-                  onComplete={(score, total) => handleQuizComplete(currentStep.id, score, total)}
-                />
-              </div>
-            )}
           </div>
           
-          {/* Right side: Code Editor or Checklist */}
+          {/* Right side: Code Editor, Checklist, or Quiz */}
           {hasRealCodeChallenge(currentStep) && (
             <div className="lg:w-1/2 h-full flex flex-col">
               <h3 className="text-xl font-semibold mb-2">Code Challenge</h3>
@@ -493,6 +484,18 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
                   onComplete={(isCompleted) => handleChecklistComplete(currentStep.id, isCompleted)}
                   onItemToggle={(itemId, completed) => handleChecklistItemToggle(currentStep.id, itemId, completed)}
                   onInputChange={(itemId, value) => handleChecklistItemInputChange(currentStep.id, itemId, value)}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Quiz on right side when there's no code challenge or checklist */}
+          {!hasRealCodeChallenge(currentStep) && !currentStep.checklist && currentStep.quiz && (
+            <div className="lg:w-1/2 h-full flex flex-col">
+              <div className="bg-white rounded-lg shadow-md h-full overflow-auto">
+                <Quiz 
+                  questions={currentStep.quiz} 
+                  onComplete={(score, total) => handleQuizComplete(currentStep.id, score, total)}
                 />
               </div>
             </div>
