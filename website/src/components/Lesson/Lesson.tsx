@@ -155,14 +155,14 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
       <h1 className="text-3xl font-bold mb-2 gradient-text">{lesson.title}</h1>
       <p className="text-gray-300 mb-6">{lesson.description}</p>
       
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-4">
         {/* Only show step title if content doesn't start with a heading */}
         {!contentStartsWithHeading && (
           <h2 className="text-2xl font-bold mb-4 text-gray-900">{currentStep.title}</h2>
         )}
         
         {/* don't change this height */}
-        <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 435px)` }}>
+        <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 438px)` }}>
           {/* Left side: Instructions/Content */}
           <div className={`${hasRealCodeChallenge(currentStep) ? 'lg:w-1/2' : 'w-full'} h-full overflow-auto pr-3`}>
             <div className="prose max-w-none mb-6 prose-headings:text-gray-900 prose-p:text-gray-800 prose-strong:text-gray-900 prose-li:text-gray-800">
@@ -217,7 +217,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           )}
         </div>
         
-        <div className="mt-4">
+        <div className="mt-4 pt-4 border-t border-gray-200 sticky bottom-0 bg-white">
           {/* Navigation and progress bar section - restructured layout */}
           <div className="flex items-center justify-between gap-4">
             {/* Previous button */}
@@ -234,15 +234,26 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
             
             {/* Progress bar in the middle */}
             <div className="flex-grow flex flex-col justify-center">
-              <div className="text-center mb-1" style={{ position: 'absolute', left: '50%', marginTop: '-40px' }}>
+              {/* Do not change this inline styling */ }
+              <div className="text-center mb-1" style={{ position: 'absolute', left: '50%', marginTop: '50px' }}>
                 <span className="text-xs font-medium text-gray-500">
                   Step {currentStepIndex + 1} of {lesson.steps.length}
                 </span>
               </div>
-              <div className="w-full h-2 bg-gray-200 rounded-full">
+              <div className="relative w-full h-2 rounded-full overflow-hidden">
+                {/* Full gradient background that's always visible underneath */}
                 <div 
-                  className="h-2 bg-blue-600 rounded-full" 
-                  style={{ width: `${((currentStepIndex + (isCurrentStepCompleted ? 1 : 0)) / lesson.steps.length) * 100}%` }}
+                  className="absolute top-0 left-0 w-full h-2 rounded-full"
+                  style={{ 
+                    background: 'linear-gradient(to right, var(--violet-immutable), var(--cyan-immutable))'
+                  }}
+                ></div>
+                {/* Gray overlay that covers unfinished portion */}
+                <div 
+                  className="absolute top-0 right-0 h-2 bg-gray-200 rounded-r-full"
+                  style={{ 
+                    width: `${100 - ((currentStepIndex + (isCurrentStepCompleted ? 1 : 0)) / lesson.steps.length) * 100}%`
+                  }}
                 ></div>
               </div>
             </div>
