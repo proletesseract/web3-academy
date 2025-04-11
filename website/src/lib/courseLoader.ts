@@ -239,7 +239,8 @@ async function loadLesson(coursePath: string, lessonInfo: LessonInfo): Promise<L
 // Function to load a single step
 async function loadStep(lessonPath: string, stepInfo: StepInfo): Promise<LessonStep> {
   const contentPath = path.join(lessonPath, stepInfo.contentFile);
-  const codePath = path.join(lessonPath, stepInfo.codeFile);
+  const codePath = path.join(lessonPath, stepInfo.codeFile.replace('code.ts', 'code-start.ts'));
+  const solutionPath = path.join(lessonPath, stepInfo.codeFile.replace('code.ts', 'code-solution.ts'));
   
   // Read content from markdown file
   const content = fs.existsSync(contentPath) 
@@ -250,10 +251,17 @@ async function loadStep(lessonPath: string, stepInfo: StepInfo): Promise<LessonS
   let codeChallenge;
   if (stepInfo.isCodeRequired && fs.existsSync(codePath)) {
     const code = fs.readFileSync(codePath, 'utf-8');
+    
+    // Try to read solution file if it exists
+    let solution = '';
+    if (fs.existsSync(solutionPath)) {
+      solution = fs.readFileSync(solutionPath, 'utf-8');
+    }
+    
     codeChallenge = {
       defaultCode: code,
       language: 'typescript',
-      solution: '', // The solution would need to be extracted from the code or another file
+      solution: solution,
     };
   }
   

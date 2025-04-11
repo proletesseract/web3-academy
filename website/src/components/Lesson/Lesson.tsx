@@ -106,8 +106,33 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   };
   
   const validateCode = (code: string, solution: string): boolean => {
-    // Basic validation - can be expanded with more sophisticated validation
-    return code.includes(solution.trim());
+    if (!solution) return false;
+    
+    // Different validation strategies based on the step
+    switch (currentStep.id) {
+      case '02':
+        // For step 2, check for required configuration properties
+        const requiredProperties = [
+          'environment',
+          'clientId',
+          'redirectUri',
+          'audience',
+          'scope'
+        ];
+        return requiredProperties.every(prop => code.includes(prop));
+        
+      case '03':
+        // For step 3, check for Passport initialization
+        return code.includes('new Passport') && code.includes('imtblConfig');
+        
+      case '04':
+        // For step 4, check for loginCallback and router.push
+        return code.includes('loginCallback') && code.includes('router.push');
+        
+      default:
+        // Default validation - check if the code includes the solution string
+        return code.includes(solution.trim());
+    }
   };
   
   const handleCodeValidation = (stepId: string, isValid: boolean) => {
