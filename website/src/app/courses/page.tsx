@@ -24,7 +24,9 @@ export default function CoursesPage() {
     async function fetchCourses() {
       try {
         setLoading(true);
-        const response = await fetch('/api/courses');
+        
+        // Add cache-busting query parameter to force fresh data
+        const response = await fetch(`/api/courses?t=${Date.now()}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch courses');
@@ -43,6 +45,19 @@ export default function CoursesPage() {
     
     // Always fetch fresh data
     fetchCourses();
+    
+    // Set up automatic refresh when the component becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCourses();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [initializeCourses]);
   
   if (loading) {
@@ -74,7 +89,7 @@ export default function CoursesPage() {
   
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-white">Available Courses</h1>
+      <h1 className="text-3xl font-bold mb-8 gradient-text">Available Courses</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
@@ -116,7 +131,7 @@ export default function CoursesPage() {
               </div>
               <Link 
                 href={`/courses/${course.id}`}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full block text-center"
+                className="btn-immutable-sm-gradient w-full block text-center"
               >
                 Start Learning
               </Link>

@@ -29,15 +29,6 @@
     {
       "id": "03",
       "path": "03",
-      "title": "Connecting to Immutable zkEVM",
-      "description": "Use Passport to connect to Immutable zkEVM and interact with smart contracts",
-      "difficulty": "intermediate",
-      "timeToComplete": "60 minutes",
-      "comingSoon": true
-    },
-    {
-      "id": "04",
-      "path": "04",
       "title": "Advanced Passport Features",
       "description": "Implement advanced features like transaction signing and wallet management",
       "difficulty": "advanced",

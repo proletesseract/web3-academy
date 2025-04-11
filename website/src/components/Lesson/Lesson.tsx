@@ -29,6 +29,7 @@ interface LessonProps {
 // Add custom styles for markdown content
 const markdownStyles = {
   // Apply to all text elements in the markdown
+   // do not add a gradient-text class to h1
   p: 'text-gray-800 text-base leading-relaxed mb-4',
   h1: 'text-2xl font-bold text-gray-900 mb-4 mt-6',
   h2: 'text-xl font-bold text-gray-900 mb-3 mt-5',
@@ -53,6 +54,9 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   const [initialized, setInitialized] = useState(false);
   
   const currentStep = lesson.steps[currentStepIndex];
+  
+  // Check if content starts with a heading (# Title) to avoid duplicate titles
+  const contentStartsWithHeading = currentStep?.content.trim().startsWith('# ');
   
   // Initialize auto-completion for content-only steps
   useEffect(() => {
@@ -148,7 +152,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   
   return (
     <div className="w-full px-4 py-2">
-      <h1 className="text-3xl font-bold mb-2 text-white">{lesson.title}</h1>
+      <h1 className="text-3xl font-bold mb-2 gradient-text">{lesson.title}</h1>
       <p className="text-gray-300 mb-6">{lesson.description}</p>
       
       <div className="mb-6">
@@ -166,7 +170,11 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
       </div>
       
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">{currentStep.title}</h2>
+        {/* Only show step title if content doesn't start with a heading */}
+        {!contentStartsWithHeading && (
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">{currentStep.title}</h2>
+        )}
+        
         {/* don't change this height */}
         <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 435px)` }}>
           {/* Left side: Instructions/Content */}
@@ -227,11 +235,10 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           <button
             onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
             disabled={currentStepIndex === 0}
-            className={`px-4 py-2 rounded ${
-              currentStepIndex === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-            }`}
+            className={currentStepIndex === 0
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
+              : 'btn-immutable-sm-inverted'
+            }
           >
             Previous
           </button>
@@ -245,7 +252,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
                     [currentStep.id]: true
                   }));
                 }}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                className="btn-immutable-sm-inverted"
               >
                 Mark as Complete
               </button>
@@ -254,11 +261,10 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
             <button
               onClick={handleNextStep}
               disabled={!isCurrentStepCompleted}
-              className={`px-4 py-2 rounded ${
-                isCurrentStepCompleted
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              className={!isCurrentStepCompleted
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
+                : 'btn-immutable-sm-gradient'
+              }
             >
               {currentStepIndex < lesson.steps.length - 1 ? 'Next' : 'Complete Lesson'}
             </button>

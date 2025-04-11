@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import useLessonStore from '../../../store/lessonStore';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -11,13 +12,42 @@ export default function CourseDetailPage() {
   const courseId = params.courseId as string;
   const [isLoading, setIsLoading] = useState(true);
   
-  const { getCourseById, setCurrentLesson } = useLessonStore();
-  const course = getCourseById(courseId);
+  const { getCourseById, setCurrentLesson, initializeCourses } = useLessonStore();
+  const [course, setCourse] = useState<any>(null);
   
-  // Ensure consistent rendering between server and client
+  // Fetch the latest courses data to ensure it's up to date
   useEffect(() => {
-    setIsLoading(false);
-  }, []);
+    async function fetchLatestCourses() {
+      try {
+        setIsLoading(true);
+        
+        // Fetch fresh course data
+        const response = await fetch('/api/courses');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch updated courses');
+        }
+        
+        const data = await response.json();
+        
+        // Update the global store
+        initializeCourses(data.courses);
+        
+        // Find the current course in the fresh data
+        const updatedCourse = data.courses.find((c: any) => c.id === courseId);
+        setCourse(updatedCourse);
+        
+      } catch (err) {
+        console.error('Error refreshing course data:', err);
+        // Fallback to store data if API fails
+        setCourse(getCourseById(courseId));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchLatestCourses();
+  }, [courseId, getCourseById, initializeCourses]);
   
   // Show loading state during hydration to prevent mismatch
   if (isLoading) {
@@ -38,7 +68,7 @@ export default function CourseDetailPage() {
         <p className="mb-6 text-gray-300">The course you are looking for does not exist.</p>
         <Link 
           href="/courses" 
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="btn-immutable"
         >
           Back to Courses
         </Link>
@@ -53,22 +83,37 @@ export default function CourseDetailPage() {
   
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <Link 
-        href="/courses" 
-        className="text-blue-400 mb-6 inline-block hover:underline"
-      >
-        ← Back to Courses
-      </Link>
+      <div className="mb-4">
+        <Link 
+          href="/courses" 
+        >
+          ← Back to Courses
+        </Link>
+      </div>
       
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-white">{course.title}</h1>
+        <h1 className="text-3xl font-bold mb-6 gradient-text">{course.title}</h1>
+        
+        {course.id === 'immutable-passport' && (
+          <div className="w-full h-48 relative rounded-lg overflow-hidden mb-6">
+            <Image 
+              src="/images/passport-course.png"
+              alt="Immutable Passport"
+              fill
+              className="object-cover"
+              style={{ objectPosition: 'center -220px' }}
+              priority
+            />
+          </div>
+        )}
+        
         <p className="text-gray-300">{course.description}</p>
       </div>
       
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-4 text-white">Lessons</h2>
         <div className="space-y-4">
-          {course.lessons.map((lesson, index) => (
+          {course.lessons.map((lesson: any, index: number) => (
             <div 
               key={lesson.id} 
               className="bg-white p-6 rounded-lg shadow-md"
@@ -89,7 +134,7 @@ export default function CourseDetailPage() {
                 
                 <button
                   onClick={() => handleStartLesson(lesson.id)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className={lesson.completed ? "btn-immutable-gradient" : "btn-immutable-sm-gradient"}
                 >
                   {lesson.completed ? 'Continue' : 'Start Lesson'}
                 </button>

@@ -11,14 +11,25 @@ export default function LessonPage() {
   const router = useRouter();
   const lessonId = params.lessonId as string;
   const [isLoading, setIsLoading] = useState(true);
+  const [courseId, setCourseId] = useState<string | null>(null);
   
   const { getLessonById, markLessonAsCompleted } = useLessonStore();
   const lesson = getLessonById(lessonId);
   
-  // Ensure consistent rendering between server and client
+  // Find the course this lesson belongs to
   useEffect(() => {
+    const { courses } = useLessonStore.getState();
+    
+    // Find the course that contains this lesson
+    for (const course of courses) {
+      if (course.lessons.some(l => l.id === lessonId)) {
+        setCourseId(course.id);
+        break;
+      }
+    }
+    
     setIsLoading(false);
-  }, []);
+  }, [lessonId]);
   
   // Show loading state during hydration to prevent mismatch
   if (isLoading) {
@@ -38,12 +49,9 @@ export default function LessonPage() {
         <div className="p-4">
           <Link 
             href="/courses" 
-            className="text-blue-400 hover:underline inline-flex items-center"
+            className="btn-immutable"
           >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Courses
+            ← Back to Courses
           </Link>
         </div>
         <div className="p-6 text-center">
@@ -51,7 +59,7 @@ export default function LessonPage() {
           <p className="mb-6 text-gray-300">The lesson you are looking for does not exist.</p>
           <Link 
             href="/courses" 
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="btn-immutable"
           >
             Back to Courses
           </Link>
@@ -63,17 +71,6 @@ export default function LessonPage() {
   const handleLessonComplete = () => {
     markLessonAsCompleted(lessonId);
     
-    // Find the course this lesson belongs to
-    const { courses } = useLessonStore.getState();
-    let courseId = '';
-    
-    for (const course of courses) {
-      if (course.lessons.some(l => l.id === lessonId)) {
-        courseId = course.id;
-        break;
-      }
-    }
-    
     if (courseId) {
       router.push(`/courses/${courseId}`);
     } else {
@@ -83,15 +80,11 @@ export default function LessonPage() {
   
   return (
     <div className="w-full">
-      <div className="p-4">
+      <div className="mb-4 mt-4 ml-4">
         <Link 
-          href="/courses" 
-          className="text-blue-400 hover:underline inline-flex items-center"
+          href={courseId ? `/courses/${courseId}` : "/courses"} 
         >
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Courses
+          ← Back to {courseId ? 'Lessons' : 'Courses'}
         </Link>
       </div>
       <Lesson 
