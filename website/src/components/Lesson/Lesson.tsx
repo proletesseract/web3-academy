@@ -57,6 +57,9 @@ const markdownStyles = {
 };
 
 const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
+  // Add isResetting state
+  const [isResetting, setIsResetting] = useState(false);
+  
   // Get the stored step index from localStorage or default to 0
   const [currentStepIndex, setCurrentStepIndex] = useState(() => {
     const storedIndex = localStorage.getItem(`lesson-${lesson.id}-step-index`);
@@ -148,6 +151,29 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+  
+  // Add reset effect
+  useEffect(() => {
+    if (isResetting) {
+      // Clear all localStorage items for this lesson
+      localStorage.removeItem(`lesson-${lesson.id}-step-index`);
+      localStorage.removeItem(`lesson-${lesson.id}-code`);
+      localStorage.removeItem(`lesson-${lesson.id}-completed`);
+      localStorage.removeItem(`lesson-${lesson.id}-checklists`);
+      localStorage.removeItem(`lesson-${lesson.id}-input-values`);
+      
+      // Reset all state variables
+      setCurrentStepIndex(0);
+      setCodeByStep({});
+      setStepCompleted({});
+      setChecklistsCompleted({});
+      setChecklistInputValues({});
+      setResetKey(0);
+      
+      // Reset isResetting flag
+      setIsResetting(false);
+    }
+  }, [isResetting, lesson.id]);
   
   const handleCodeChange = (stepId: string, code: string | undefined) => {
     if (code) {
@@ -360,6 +386,11 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   // Calculate content height based on window height, minus headers and footers
   const contentHeight = windowHeight - 220; // 220px accounts for headers, footers, margins
   
+  // Add a new function to reset the entire lesson
+  const resetLesson = () => {
+    setIsResetting(true);
+  };
+  
   return (
     <div className="w-full px-4 py-2">
       <h1 className="text-3xl font-bold mb-2 gradient-text">{lesson.title}</h1>
@@ -371,17 +402,23 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           <h2 className="text-2xl font-bold mb-4 text-gray-900">{currentStep.title}</h2>
         )}
         
-        {/* Reset button for code editor */}
-        {hasRealCodeChallenge(currentStep) && (
-          <div className="flex justify-end mb-2" style={{ position: 'absolute', right: '40px', marginTop: '-9px' }}>
+        {/* Reset buttons for code editor and lesson */}
+        <div className="flex justify-end mb-2" style={{ position: 'absolute', right: '40px', marginTop: '-9px' }}>
+          {hasRealCodeChallenge(currentStep) && (
             <button
               onClick={resetCodeEditor}
-              className="btn-immutable-tiny-inverted"
+              className="btn-immutable-tiny-inverted mr-2"
             >
               Reset Code
             </button>
-          </div>
-        )}
+          )}
+          <button
+            onClick={resetLesson}
+            className="btn-immutable-tiny-inverted"
+          >
+            Reset Lesson
+          </button>
+        </div>
         
         {/* don't change this height */}
         <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 445px)` }}>

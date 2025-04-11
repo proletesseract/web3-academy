@@ -36,6 +36,7 @@ interface LessonStore {
   markStepAsCompleted: (lessonId: string, stepId: string) => void;
   markLessonAsCompleted: (lessonId: string) => void;
   setCurrentLesson: (lessonId: string) => void;
+  resetLessonProgress: (lessonId: string) => void;
   
   // Selectors
   getCurrentLesson: () => Lesson | undefined;
@@ -73,6 +74,28 @@ const useLessonStore = create<LessonStore>()(
           },
         },
       })),
+      
+      resetLessonProgress: (lessonId) => set((state) => {
+        // Create a new completedSteps object without the steps for this lesson
+        const newCompletedSteps = { ...state.userProgress.completedSteps };
+        Object.keys(newCompletedSteps).forEach(key => {
+          if (key.startsWith(`${lessonId}-`)) {
+            delete newCompletedSteps[key];
+          }
+        });
+        
+        // Create a new completedLessons object without this lesson
+        const newCompletedLessons = { ...state.userProgress.completedLessons };
+        delete newCompletedLessons[lessonId];
+        
+        return {
+          userProgress: {
+            ...state.userProgress,
+            completedSteps: newCompletedSteps,
+            completedLessons: newCompletedLessons,
+          },
+        };
+      }),
       
       setCurrentLesson: (lessonId) => set((state) => ({
         userProgress: {

@@ -12,7 +12,7 @@ export default function CourseDetailPage() {
   const courseId = params?.courseId as string || '';
   const [isLoading, setIsLoading] = useState(true);
   
-  const { getCourseById, setCurrentLesson, initializeCourses, userProgress } = useLessonStore();
+  const { getCourseById, setCurrentLesson, initializeCourses, userProgress, resetLessonProgress } = useLessonStore();
   const [course, setCourse] = useState<any>(null);
   
   // Fetch the latest courses data to ensure it's up to date
@@ -92,7 +92,19 @@ export default function CourseDetailPage() {
     );
   }
   
-  const handleStartLesson = (lessonId: string) => {
+  const handleStartLesson = (lessonId: string, isRedo: boolean = false) => {
+    if (isRedo) {
+      // Reset the lesson progress before starting
+      resetLessonProgress(lessonId);
+      
+      // Clear any localStorage data for this lesson
+      localStorage.removeItem(`lesson-${lessonId}-step-index`);
+      localStorage.removeItem(`lesson-${lessonId}-code`);
+      localStorage.removeItem(`lesson-${lessonId}-completed`);
+      localStorage.removeItem(`lesson-${lessonId}-checklists`);
+      localStorage.removeItem(`lesson-${lessonId}-input-values`);
+    }
+    
     setCurrentLesson(lessonId);
     router.push(`/lessons/${lessonId}`);
   };
@@ -167,7 +179,7 @@ export default function CourseDetailPage() {
                   </div>
                   
                   <button
-                    onClick={() => handleStartLesson(lesson.id)}
+                    onClick={() => handleStartLesson(lesson.id, lesson.completed)}
                     disabled={hasUncompletedPrerequisites}
                     className={
                       hasUncompletedPrerequisites 
@@ -177,7 +189,7 @@ export default function CourseDetailPage() {
                           : "btn-immutable-sm-gradient"
                     }
                   >
-                    {lesson.completed ? 'Restart Lesson' : 'Start Lesson'}
+                    {lesson.completed ? 'Redo Lesson' : 'Start Lesson'}
                   </button>
                 </div>
               </div>
