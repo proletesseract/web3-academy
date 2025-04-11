@@ -1,4 +1,3 @@
-// src/lib/imtblConfig.ts
 import { config } from '@imtbl/sdk';
 
 export const imtblConfig = {

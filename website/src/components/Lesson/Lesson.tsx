@@ -102,6 +102,10 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         ...codeByStep,
         [stepId]: code,
       });
+      
+      // Validate code on each change
+      const isValid = validateCode(code, currentStep.codeChallenge?.solution || '');
+      handleCodeValidation(stepId, isValid);
     }
   };
   
@@ -130,8 +134,10 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         return code.includes('loginCallback') && code.includes('router.push');
         
       default:
-        // Default validation - check if the code includes the solution string
-        return code.includes(solution.trim());
+        // Default validation - normalize whitespace and compare
+        const normalizedCode = code.trim().replace(/\s+/g, ' ');
+        const normalizedSolution = solution.trim().replace(/\s+/g, ' ');
+        return normalizedCode === normalizedSolution;
     }
   };
   
@@ -141,6 +147,11 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         ...stepCompleted,
         [stepId]: true,
       });
+    } else {
+      // If code becomes invalid, remove the completion status
+      const updatedStepCompleted = { ...stepCompleted };
+      delete updatedStepCompleted[stepId];
+      setStepCompleted(updatedStepCompleted);
     }
   };
   
@@ -261,9 +272,16 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   
   // A step is considered completed if it's marked as completed or is content-only
   // For steps with checklists, all items must be completed
-  const isCurrentStepCompleted = stepCompleted[currentStep.id] || 
+  // For code challenges, the code must match the solution
+  const isCurrentStepCompleted = 
+    stepCompleted[currentStep.id] || 
     (isContentOnlyStep && !currentStep.checklist) || 
     (currentStep.checklist && allChecklistItemsCompleted);
+
+  // Check if the current step has a code challenge that needs to be completed
+  const hasUncompletedCodeChallenge = 
+    hasRealCodeChallenge(currentStep) && 
+    !stepCompleted[currentStep.id];
   
   // Calculate content height based on window height, minus headers and footers
   const contentHeight = windowHeight - 220; // 220px accounts for headers, footers, margins
@@ -402,10 +420,15 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
             <div className="flex gap-2 flex-shrink-0">              
               <button
                 onClick={handleNextStep}
-                disabled={currentStep.checklist && !allChecklistItemsCompleted}
-                className={currentStep.checklist && !allChecklistItemsCompleted
-                  ? 'btn-immutable-sm-disabled'
-                  : 'btn-immutable-sm-gradient'
+                disabled={
+                  (currentStep.checklist && !allChecklistItemsCompleted) ||
+                  hasUncompletedCodeChallenge
+                }
+                className={
+                  (currentStep.checklist && !allChecklistItemsCompleted) ||
+                  hasUncompletedCodeChallenge
+                    ? 'btn-immutable-sm-disabled'
+                    : 'btn-immutable-sm-gradient'
                 }
               >
                 {currentStepIndex < lesson.steps.length - 1 ? 'Next' : 'Complete Lesson'}
