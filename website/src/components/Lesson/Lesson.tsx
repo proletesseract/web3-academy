@@ -424,7 +424,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         {/* don't change this height */}
         <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 445px)` }}>
           {/* Left side: Instructions/Content */}
-          <div className={`${hasRealCodeChallenge(currentStep) || currentStep.checklist ? 'lg:w-1/2' : 'w-full'} h-full overflow-auto pr-3`}>
+          <div className={`${hasRealCodeChallenge(currentStep) || currentStep.checklist || currentStep.quiz ? 'lg:w-1/2' : 'w-full'} h-full overflow-auto pr-3`}>
             <div className="prose max-w-none mb-6 prose-headings:text-gray-900 prose-p:text-gray-800 prose-strong:text-gray-900 prose-li:text-gray-800">
               <ReactMarkdown
                 components={{
@@ -492,7 +492,9 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           {/* Quiz on right side when there's no code challenge or checklist */}
           {!hasRealCodeChallenge(currentStep) && !currentStep.checklist && currentStep.quiz && (
             <div className="lg:w-1/2 h-full flex flex-col">
-              <div className="bg-white rounded-lg shadow-md h-full overflow-auto">
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-md h-auto h-full">
+                <h3 className="text-xl font-semibold mb-4 text-blue-900">Knowledge Check</h3>
+                <p className="text-gray-700 mb-4">Test your understanding of the concepts covered in this lesson:</p>
                 <Quiz 
                   questions={currentStep.quiz} 
                   onComplete={(score, total) => handleQuizComplete(currentStep.id, score, total)}
