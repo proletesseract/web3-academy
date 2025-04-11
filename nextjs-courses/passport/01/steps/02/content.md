@@ -1,81 +1,87 @@
-# Setting Up the Immutable SDK
+# Setting Up the Passport Instance
 
-In this step, we'll install the Immutable SDK in your Next.js project and set up the necessary configuration.
+In this step, we'll focus specifically on configuring the Passport instance for your Next.js application. Passport is Immutable's authentication solution that provides secure, seamless user authentication and wallet connection.
 
-## Installing the SDK
+## Understanding Passport Configuration
 
-First, let's install the Immutable SDK using npm:
+Passport requires specific configuration options to function correctly. Let's go through each option in detail:
 
-```bash
-npm install @imtbl/sdk
-```
+### Environment
 
-This package contains everything you need to integrate Immutable services, including Passport, into your application.
+The `environment` option determines which Immutable environment your application will connect to:
 
-## Understanding SDK Structure
-
-The Immutable SDK is modular, with several key components:
-
-- `config`: Environment configuration and shared types
-- `passport`: Authentication and wallet functionality
-- `blockchain-data`: API for fetching blockchain data
-- `checkout`: Integration with checkout experiences
-
-For our authentication use case, we'll primarily be using the `passport` module and `config` for environment settings.
-
-## Setting Up Environment Variables
-
-Next, create a `.env.local` file in the root of your Next.js project to store your environment variables securely:
-
-```
-NEXT_PUBLIC_IMMUTABLE_CLIENT_ID=your-client-id-from-immutable-hub
-NEXT_PUBLIC_IMMUTABLE_REDIRECT_URI=http://localhost:3000/callback
-NEXT_PUBLIC_IMMUTABLE_LOGOUT_REDIRECT_URI=http://localhost:3000/
-```
-
-Replace `your-client-id-from-immutable-hub` with the Client ID you obtained from the Immutable Hub.
-
-## Creating a Config File
-
-Now, let's create a configuration file to centralize our Immutable SDK settings. Create a new file called `imtblConfig.ts` in your project's `src/lib` directory:
+- `SANDBOX`: Use this for development and testing. It connects to Immutable's sandbox environment where you can test features without using real assets.
+- `PRODUCTION`: Use this for your live application. It connects to Immutable's production environment where real transactions occur.
 
 ```typescript
-// src/lib/imtblConfig.ts
-import { config } from '@imtbl/sdk';
-
-export const imtblConfig = {
-  environment: config.Environment.SANDBOX, // Use PRODUCTION for production apps
-  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID as string,
-  redirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_REDIRECT_URI as string,
-  logoutRedirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_LOGOUT_REDIRECT_URI as string,
-  audience: 'platform_api',
-  scope: 'openid offline_access email transact'
-};
+environment: config.Environment.SANDBOX // or config.Environment.PRODUCTION
 ```
 
-This file will serve as a central location for all our Immutable SDK configuration options.
+### Client ID
 
-## Setting Up Next.js Environment Variable Types
+The `clientId` is a unique identifier for your application. You obtain this when registering your application with Immutable:
 
-For better TypeScript support, let's update the Next.js environment types. Create or update the `next-env.d.ts` file in your project root:
+- It's used to identify your application to Immutable's services
+- It's required for all authentication flows
+- It should be stored as an environment variable for security
 
 ```typescript
-/// <reference types="next" />
-/// <reference types="next/types/global" />
+clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID as string
+```
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    NEXT_PUBLIC_IMMUTABLE_CLIENT_ID: string;
-    NEXT_PUBLIC_IMMUTABLE_REDIRECT_URI: string;
-    NEXT_PUBLIC_IMMUTABLE_LOGOUT_REDIRECT_URI: string;
-  }
-}
+### Redirect URI
+
+The `redirectUri` is where users will be sent after completing the authentication process:
+
+- It must match exactly what you registered with Immutable
+- It should be a valid URL in your application (typically a callback route)
+- It's used in the OAuth flow to return users to your application
+
+```typescript
+redirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_REDIRECT_URI as string
+```
+
+### Logout Redirect URI
+
+The `logoutRedirectUri` is where users will be sent after logging out:
+
+- Similar to the redirect URI, it must match what you registered
+- It's typically a page in your application where users land after signing out
+- It helps provide a seamless user experience during the logout flow
+
+```typescript
+logoutRedirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_LOGOUT_REDIRECT_URI as string
+```
+
+### Audience
+
+The `audience` option specifies which API the authentication token is intended for:
+
+- For Passport, this should be set to `'platform_api'`
+- It's used in the JWT token to indicate which service should accept the token
+- This is a required field for proper authentication
+
+```typescript
+audience: 'platform_api'
+```
+
+### Scope
+
+The `scope` option defines what permissions your application is requesting:
+
+- `openid`: Required for OpenID Connect authentication
+- `offline_access`: Allows your application to refresh tokens
+- `email`: Requests access to the user's email
+- `transact`: Allows your application to initiate transactions on behalf of the user
+
+```typescript
+scope: 'openid offline_access email transact'
 ```
 
 ## Your Code Challenge
 
-Complete the configuration by setting up the `imtblConfig.ts` file. Make sure to include all the required configuration options for the Passport client.
+Complete the configuration by setting up the `imtblConfig.ts` file with all the required configuration options for the Passport client. Make sure to include all the properties we've discussed: environment, clientId, redirectUri, logoutRedirectUri, audience, and scope.
 
 ## Next Steps
 
-In the next step, we'll create a Passport client using this configuration. 
+In the next step, we'll create a Passport client using this configuration and implement the authentication flow. 

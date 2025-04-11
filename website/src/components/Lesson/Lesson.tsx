@@ -57,18 +57,68 @@ const markdownStyles = {
 };
 
 const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [codeByStep, setCodeByStep] = useState<Record<string, string>>({});
-  const [stepCompleted, setStepCompleted] = useState<Record<string, boolean>>({});
+  // Get the stored step index from localStorage or default to 0
+  const [currentStepIndex, setCurrentStepIndex] = useState(() => {
+    const storedIndex = localStorage.getItem(`lesson-${lesson.id}-step-index`);
+    return storedIndex ? parseInt(storedIndex, 10) : 0;
+  });
+  
+  // Get stored code progress from localStorage or default to empty object
+  const [codeByStep, setCodeByStep] = useState<Record<string, string>>(() => {
+    const storedCode = localStorage.getItem(`lesson-${lesson.id}-code`);
+    return storedCode ? JSON.parse(storedCode) : {};
+  });
+  
+  // Get stored completion status from localStorage or default to empty object
+  const [stepCompleted, setStepCompleted] = useState<Record<string, boolean>>(() => {
+    const storedCompleted = localStorage.getItem(`lesson-${lesson.id}-completed`);
+    return storedCompleted ? JSON.parse(storedCompleted) : {};
+  });
+  
   const [windowHeight, setWindowHeight] = useState(0);
   const [initialized, setInitialized] = useState(false);
-  const [checklistsCompleted, setChecklistsCompleted] = useState<Record<string, boolean>>({});
-  const [checklistInputValues, setChecklistInputValues] = useState<Record<string, string>>({});
+  
+  // Get stored checklist completion status from localStorage or default to empty object
+  const [checklistsCompleted, setChecklistsCompleted] = useState<Record<string, boolean>>(() => {
+    const storedChecklists = localStorage.getItem(`lesson-${lesson.id}-checklists`);
+    return storedChecklists ? JSON.parse(storedChecklists) : {};
+  });
+  
+  // Get stored checklist input values from localStorage or default to empty object
+  const [checklistInputValues, setChecklistInputValues] = useState<Record<string, string>>(() => {
+    const storedInputValues = localStorage.getItem(`lesson-${lesson.id}-input-values`);
+    return storedInputValues ? JSON.parse(storedInputValues) : {};
+  });
   
   const currentStep = lesson.steps[currentStepIndex];
   
   // Check if content starts with a heading (# Title) to avoid duplicate titles
   const contentStartsWithHeading = currentStep?.content.trim().startsWith('# ');
+  
+  // Save the current step index to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`lesson-${lesson.id}-step-index`, currentStepIndex.toString());
+  }, [currentStepIndex, lesson.id]);
+  
+  // Save code progress to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`lesson-${lesson.id}-code`, JSON.stringify(codeByStep));
+  }, [codeByStep, lesson.id]);
+  
+  // Save completion status to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`lesson-${lesson.id}-completed`, JSON.stringify(stepCompleted));
+  }, [stepCompleted, lesson.id]);
+  
+  // Save checklist completion status to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`lesson-${lesson.id}-checklists`, JSON.stringify(checklistsCompleted));
+  }, [checklistsCompleted, lesson.id]);
+  
+  // Save checklist input values to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(`lesson-${lesson.id}-input-values`, JSON.stringify(checklistInputValues));
+  }, [checklistInputValues, lesson.id]);
   
   // Initialize auto-completion for content-only steps
   useEffect(() => {
@@ -341,7 +391,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
               <h3 className="text-xl font-semibold mb-2">Code Challenge</h3>
               <div className="flex-grow" style={{ height: 'calc(100% - 32px)' }}>
                 <CodeEditor 
-                  defaultValue={currentStep.codeChallenge!.defaultCode}
+                  defaultValue={codeByStep[currentStep.id] || currentStep.codeChallenge!.defaultCode}
                   language={currentStep.codeChallenge!.language || 'typescript'}
                   onChange={(code) => handleCodeChange(currentStep.id, code)}
                   onValidate={(isValid) => handleCodeValidation(currentStep.id, isValid)}
