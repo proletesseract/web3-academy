@@ -5,8 +5,8 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center p-6 text-center">
-      <h1 className="text-5xl font-bold mb-6 text-white">Immutable Academy</h1>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-6 text-center">
+      <h1 className="text-5xl font-bold mb-6 gradient-text">Immutable Academy</h1>
       <p className="text-xl max-w-3xl mb-10 text-gray-300">
         Learn how to build on Immutable X with our interactive tutorials.
         Master blockchain development through hands-on coding exercises and quizzes.
@@ -15,7 +15,7 @@ export default function Home() {
       <div className="flex gap-4">
         <Link 
           href="/courses" 
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-lg font-medium"
+          className="btn-immutable-gradient"
         >
           Start Learning
         </Link>
@@ -23,7 +23,7 @@ export default function Home() {
           href="https://docs.immutable.com/" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-lg font-medium"
+          className="btn-immutable"
         >
           Documentation
         </a>
@@ -51,27 +51,6 @@ export default function Home() {
           </p>
         </div>
       </div>
-      
-      <footer className="bg-gray-800 text-white py-6 w-full mt-20">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <h2 className="text-xl font-bold">Immutable Academy</h2>
-            <p className="text-gray-400">Learn to build on Immutable X</p>
-          </div>
-          
-          <div className="flex gap-4">
-            <a href="https://discord.gg/immutablex" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white">
-              Discord
-            </a>
-            <a href="https://twitter.com/Immutable" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white">
-              Twitter
-            </a>
-            <a href="https://www.immutable.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white">
-              Immutable
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

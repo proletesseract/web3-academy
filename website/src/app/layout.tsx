@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ReactNode } from "react";
 import Navbar from "../components/Navigation/Navbar";
+import Footer from "../components/Navigation/Footer";
+import PageBackground from "../components/Background/PageBackground";
 
 export const metadata: Metadata = {
   title: "Immutable Academy",
@@ -15,12 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-fixed">
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-black/70 to-black/80">
+      <body>
+        <PageBackground />
+        <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow">
             {children}
           </main>
+          <Footer />
         </div>
       </body>
     </html>

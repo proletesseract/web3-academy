@@ -92,6 +92,7 @@ export default function CoursesPage() {
                     // Fallback if image doesn't exist
                     const target = e.target as HTMLImageElement;
                     target.src = '/images/course-placeholder.jpg';
+                    console.error(`Failed to load image: ${course.image}`);
                   }}
                 />
               ) : (

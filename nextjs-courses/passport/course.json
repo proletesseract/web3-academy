@@ -7,6 +7,7 @@
   "tags": ["authentication", "passport", "web3", "nextjs", "blockchain"],
   "difficulty": "intermediate",
   "estimatedTime": "4 hours",
+  "image": "/images/passport-course.png",
   "lessons": [
     {
       "id": "01",

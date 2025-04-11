@@ -11,6 +11,7 @@ export interface CourseManifest {
   tags: string[];
   difficulty: string;
   estimatedTime: string;
+  image?: string;
   lessons: LessonInfo[];
   prerequisites: Prerequisite[];
   resources: Resource[];
@@ -130,12 +131,18 @@ export async function loadCourses(): Promise<Course[]> {
       fs.readFileSync(courseManifestPath, 'utf-8')
     );
     
+    // Ensure image path has a leading slash
+    let imagePath = courseManifest.image || `/images/courses/${courseManifest.courseId}.jpg`;
+    if (imagePath && !imagePath.startsWith('/')) {
+      imagePath = `/${imagePath}`;
+    }
+    
     // Create course object with lessons
     const course: Course = {
       id: courseManifest.courseId,
       title: courseManifest.title,
       description: courseManifest.description,
-      image: `/images/courses/${courseManifest.courseId}.jpg`, // Expected naming convention
+      image: imagePath, // Use processed image path
       lessons: [],
       prerequisites: courseManifest.prerequisites,
       resources: courseManifest.resources
