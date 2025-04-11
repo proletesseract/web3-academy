@@ -155,20 +155,6 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
       <h1 className="text-3xl font-bold mb-2 gradient-text">{lesson.title}</h1>
       <p className="text-gray-300 mb-6">{lesson.description}</p>
       
-      <div className="mb-6">
-        <div className="flex items-center mb-4">
-          <div className="flex-1 h-2 bg-gray-200 rounded-full">
-            <div 
-              className="h-2 bg-blue-600 rounded-full" 
-              style={{ width: `${((currentStepIndex + (isCurrentStepCompleted ? 1 : 0)) / lesson.steps.length) * 100}%` }}
-            ></div>
-          </div>
-          <span className="ml-4 text-sm font-medium text-gray-300">
-            Step {currentStepIndex + 1} of {lesson.steps.length}
-          </span>
-        </div>
-      </div>
-      
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         {/* Only show step title if content doesn't start with a heading */}
         {!contentStartsWithHeading && (
@@ -231,43 +217,63 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           )}
         </div>
         
-        <div className="flex justify-between mt-4">
-          <button
-            onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
-            disabled={currentStepIndex === 0}
-            className={currentStepIndex === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
-              : 'btn-immutable-sm-inverted'
-            }
-          >
-            Previous
-          </button>
-          
-          <div className="flex gap-2">
-            {!isCurrentStepCompleted && (
-              <button
-                onClick={() => {
-                  setStepCompleted(prev => ({
-                    ...prev,
-                    [currentStep.id]: true
-                  }));
-                }}
-                className="btn-immutable-sm-inverted"
-              >
-                Mark as Complete
-              </button>
-            )}
-            
+        <div className="mt-4">
+          {/* Navigation and progress bar section - restructured layout */}
+          <div className="flex items-center justify-between gap-4">
+            {/* Previous button */}
             <button
-              onClick={handleNextStep}
-              disabled={!isCurrentStepCompleted}
-              className={!isCurrentStepCompleted
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
-                : 'btn-immutable-sm-gradient'
+              onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
+              disabled={currentStepIndex === 0}
+              className={currentStepIndex === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2 flex-shrink-0'
+                : 'btn-immutable-sm-inverted flex-shrink-0'
               }
             >
-              {currentStepIndex < lesson.steps.length - 1 ? 'Next' : 'Complete Lesson'}
+              Previous
             </button>
+            
+            {/* Progress bar in the middle */}
+            <div className="flex-grow flex flex-col justify-center">
+              <div className="text-center mb-1" style={{ position: 'absolute', left: '50%', marginTop: '-40px' }}>
+                <span className="text-xs font-medium text-gray-500">
+                  Step {currentStepIndex + 1} of {lesson.steps.length}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-full">
+                <div 
+                  className="h-2 bg-blue-600 rounded-full" 
+                  style={{ width: `${((currentStepIndex + (isCurrentStepCompleted ? 1 : 0)) / lesson.steps.length) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* Next/Complete buttons */}
+            <div className="flex gap-2 flex-shrink-0">
+              {!isCurrentStepCompleted && (
+                <button
+                  onClick={() => {
+                    setStepCompleted(prev => ({
+                      ...prev,
+                      [currentStep.id]: true
+                    }));
+                  }}
+                  className="btn-immutable-sm-inverted"
+                >
+                  Mark as Complete
+                </button>
+              )}
+              
+              <button
+                onClick={handleNextStep}
+                disabled={!isCurrentStepCompleted}
+                className={!isCurrentStepCompleted
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
+                  : 'btn-immutable-sm-gradient'
+                }
+              >
+                {currentStepIndex < lesson.steps.length - 1 ? 'Next' : 'Complete Lesson'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
