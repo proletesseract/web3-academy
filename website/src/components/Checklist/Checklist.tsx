@@ -83,11 +83,8 @@ const Checklist: React.FC<ChecklistProps> = ({ items, onComplete, onItemToggle, 
                   value={item.inputValue || ''}
                   onChange={(e) => handleInputChange(item.id, e.target.value)}
                   placeholder={item.placeholder || 'Enter value...'}
-                  className={`w-full p-2 border rounded-md text-gray-800 placeholder-gray-500 ${
-                    item.completed 
-                      ? 'border-green-500 bg-green-50' 
-                      : 'border-gray-300 focus:border-violet-500 focus:ring focus:ring-violet-200'
-                  }`}
+                  className={`w-full p-2 border rounded-md text-gray-800 placeholder-gray-500 
+                    border-gray-300 focus:border-violet-500 focus:ring focus:ring-violet-200`}
                 />
               </div>
             </>

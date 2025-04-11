@@ -255,7 +255,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         )}
         
         {/* don't change this height */}
-        <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 438px)` }}>
+        <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 445px)` }}>
           {/* Left side: Instructions/Content */}
           <div className={`${hasRealCodeChallenge(currentStep) || currentStep.checklist ? 'lg:w-1/2' : 'w-full'} h-full overflow-auto pr-3`}>
             <div className="prose max-w-none mb-6 prose-headings:text-gray-900 prose-p:text-gray-800 prose-strong:text-gray-900 prose-li:text-gray-800">
@@ -312,7 +312,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           {/* Checklist on right side when there's no code challenge */}
           {!hasRealCodeChallenge(currentStep) && currentStep.checklist && (
             <div className="lg:w-1/2 h-full flex flex-col">
-              <div className="bg-violet-50 border-l-4 border-violet-500 p-5 rounded-md h-auto">
+              <div className="bg-violet-50 border-l-4 border-violet-500 p-5 rounded-md h-auto h-full">
                 <h3 className="text-xl font-semibold mb-4 text-violet-900">Setup Checklist</h3>
                 <p className="text-gray-700 mb-4">Complete these steps before moving to the next lesson:</p>
                 <Checklist 
@@ -340,8 +340,8 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
               onClick={() => setCurrentStepIndex(Math.max(0, currentStepIndex - 1))}
               disabled={currentStepIndex === 0}
               className={currentStepIndex === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2 flex-shrink-0'
-                : 'btn-immutable-sm-inverted flex-shrink-0'
+                ? 'btn-immutable-sm-disabled'
+                : 'btn-immutable-sm-inverted'
               }
             >
               Previous
@@ -374,26 +374,12 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
             </div>
             
             {/* Next/Complete buttons */}
-            <div className="flex gap-2 flex-shrink-0">
-              {!isCurrentStepCompleted && (
-                <button
-                  onClick={() => {
-                    setStepCompleted(prev => ({
-                      ...prev,
-                      [currentStep.id]: true
-                    }));
-                  }}
-                  className="btn-immutable-sm-inverted"
-                >
-                  Mark as Complete
-                </button>
-              )}
-              
+            <div className="flex gap-2 flex-shrink-0">              
               <button
                 onClick={handleNextStep}
                 disabled={currentStep.checklist && !allChecklistItemsCompleted}
                 className={currentStep.checklist && !allChecklistItemsCompleted
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-full px-4 py-2'
+                  ? 'btn-immutable-sm-disabled'
                   : 'btn-immutable-sm-gradient'
                 }
               >
