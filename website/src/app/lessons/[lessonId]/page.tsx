@@ -6,10 +6,14 @@ import useLessonStore from '../../../store/lessonStore';
 import Lesson from '../../../components/Lesson/Lesson';
 import Link from 'next/link';
 
+// Remove the server-side exports that cause the error
+// export const dynamic = 'force-dynamic';
+// export const revalidate = 0;
+
 export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
-  const lessonId = params.lessonId as string;
+  const lessonId = params?.lessonId as string || '';
   const [isLoading, setIsLoading] = useState(true);
   const [courseId, setCourseId] = useState<string | null>(null);
   
@@ -18,17 +22,42 @@ export default function LessonPage() {
   
   // Find the course this lesson belongs to
   useEffect(() => {
-    const { courses } = useLessonStore.getState();
-    
-    // Find the course that contains this lesson
-    for (const course of courses) {
-      if (course.lessons.some(l => l.id === lessonId)) {
-        setCourseId(course.id);
-        break;
+    // Force rehydrate the lesson data when the component loads
+    const fetchData = async () => {
+      try {
+        // Call the revalidation API first
+        await fetch(`/api/revalidate?path=/lessons/${lessonId}`, { 
+          cache: 'no-store'
+        });
+        
+        // Then fetch the lesson data
+        const response = await fetch(`/api/lessons/${lessonId}/refresh?_=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        // Even if the fetch fails, we'll still try to get the course from the store
+        console.log('Refreshed lesson data from server');
+      } catch (error) {
+        console.log('Error refreshing lesson data:', error);
       }
-    }
+      
+      const { courses } = useLessonStore.getState();
+      
+      // Find the course that contains this lesson
+      for (const course of courses) {
+        if (course.lessons.some(l => l.id === lessonId)) {
+          setCourseId(course.id);
+          break;
+        }
+      }
+      
+      setIsLoading(false);
+    };
     
-    setIsLoading(false);
+    fetchData();
   }, [lessonId]);
   
   // Show loading state during hydration to prevent mismatch

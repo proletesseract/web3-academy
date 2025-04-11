@@ -13,7 +13,28 @@
       "title": "Introduction to Immutable Passport",
       "contentFile": "steps/01/content.md",
       "codeFile": "steps/01/code.ts",
-      "isCodeRequired": false
+      "isCodeRequired": false,
+      "checklist": {
+        "items": [
+          {
+            "id": "create-account",
+            "text": "Created Immutable Hub Account",
+            "type": "checkbox"
+          },
+          {
+            "id": "create-app",
+            "text": "Created an Application in Hub",
+            "type": "checkbox"
+          },
+          {
+            "id": "client-id",
+            "text": "Enter your Client ID",
+            "type": "input",
+            "placeholder": "e.g., im-1234-5678-9012-3456",
+            "validationPattern": ".{8,}"
+          }
+        ]
+      }
     },
     {
       "id": "02",

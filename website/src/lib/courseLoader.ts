@@ -65,7 +65,19 @@ export interface StepInfo {
   codeFile: string;
   isCodeRequired: boolean;
   context?: {
-    hint: string;
+    hint?: string;
+  };
+  quiz?: {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+  }[];
+  checklist?: {
+    items: {
+      id: string;
+      text: string;
+    }[];
   };
 }
 
@@ -108,6 +120,16 @@ export interface LessonStep {
     options: string[];
     correctAnswer: string;
   }[];
+  checklist?: {
+    items: {
+      id: string;
+      text: string;
+      type?: 'checkbox' | 'input';
+      placeholder?: string;
+      validationPattern?: string;
+    }[];
+  };
+  _timestamp?: number; // Optional timestamp for cache busting
 }
 
 // Function to load all courses
@@ -116,6 +138,16 @@ export async function loadCourses(): Promise<Course[]> {
   const courseFolders = fs.readdirSync(coursesDir).filter(folder => {
     return fs.statSync(path.join(coursesDir, folder)).isDirectory();
   });
+
+  // Clear require cache in development to ensure fresh data
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Development mode: Clearing require cache to ensure fresh data');
+    Object.keys(require.cache).forEach(key => {
+      if (key.includes('nextjs-courses')) {
+        delete require.cache[key];
+      }
+    });
+  }
 
   const courses: Course[] = [];
 
@@ -230,7 +262,10 @@ async function loadStep(lessonPath: string, stepInfo: StepInfo): Promise<LessonS
     id: stepInfo.id,
     title: stepInfo.title,
     content,
-    ...(codeChallenge ? { codeChallenge } : {})
+    ...(codeChallenge ? { codeChallenge } : {}),
+    ...(stepInfo.quiz ? { quiz: stepInfo.quiz } : {}),
+    ...(stepInfo.checklist ? { checklist: stepInfo.checklist } : {}),
+    _timestamp: Date.now() // Add timestamp to prevent caching
   };
   
   return step;
