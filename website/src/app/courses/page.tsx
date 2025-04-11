@@ -150,6 +150,91 @@ export default function CoursesPage() {
             </div>
           </div>
         ))}
+
+        {/* Static Course Tiles */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+          <div className="h-48 bg-gray-200 relative">
+            <div className="w-full h-full flex items-center justify-center bg-blue-100">
+              <span className="text-blue-800 font-semibold text-lg">Immutable Checkout</span>
+            </div>
+          </div>
+          <div className="p-6 flex flex-col flex-grow">
+            <h2 className="text-xl font-bold mb-2 text-gray-900">Immutable Checkout</h2>
+            <p className="text-gray-600 mb-4">Learn how to integrate Immutable Checkout into your web3 applications. Master payment processing and checkout flows.</p>
+            <div className="mt-auto">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-gray-500">
+                  <span>3 lessons</span>
+                </div>
+                <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  Intermediate
+                </div>
+              </div>
+              <Link 
+                href="#"
+                className="btn-immutable-sm-gradient w-full block text-center"
+              >
+                Coming Soon
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+          <div className="h-48 bg-gray-200 relative">
+            <div className="w-full h-full flex items-center justify-center bg-blue-100">
+              <span className="text-blue-800 font-semibold text-lg">Smart Contracts</span>
+            </div>
+          </div>
+          <div className="p-6 flex flex-col flex-grow">
+            <h2 className="text-xl font-bold mb-2 text-gray-900">Smart Contracts</h2>
+            <p className="text-gray-600 mb-4">Master the art of developing smart contracts for Immutable X. Learn Solidity, security best practices, and deployment.</p>
+            <div className="mt-auto">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-gray-500">
+                  <span>3 lessons</span>
+                </div>
+                <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  Advanced
+                </div>
+              </div>
+              <Link 
+                href="#"
+                className="btn-immutable-sm-gradient w-full block text-center"
+              >
+                Coming Soon
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+          <div className="h-48 bg-gray-200 relative">
+            <div className="w-full h-full flex items-center justify-center bg-blue-100">
+              <span className="text-blue-800 font-semibold text-lg">In-game Marketplaces</span>
+            </div>
+          </div>
+          <div className="p-6 flex flex-col flex-grow">
+            <h2 className="text-xl font-bold mb-2 text-gray-900">In-game Marketplaces</h2>
+            <p className="text-gray-600 mb-4">Build and customize NFT marketplaces for your games. From basic listings to advanced features like auctions and collections.</p>
+            <div className="mt-auto">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-sm text-gray-500">
+                  <span>3 lessons</span>
+                </div>
+                <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  Intermediate
+                </div>
+              </div>
+              <Link 
+                href="#"
+                className="btn-immutable-sm-gradient w-full block text-center"
+              >
+                Coming Soon
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
 
       {courses.length === 0 && (
