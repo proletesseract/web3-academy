@@ -403,7 +403,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         )}
         
         {/* Reset buttons for code editor and lesson */}
-        <div className="flex justify-end mb-2" style={{ position: 'absolute', right: '40px', marginTop: '-9px' }}>
+        <div className="flex justify-end mb-2" style={{ position: 'absolute', right: '15px', marginTop: '-70px' }}>
           {hasRealCodeChallenge(currentStep) && (
             <button
               onClick={resetCodeEditor}

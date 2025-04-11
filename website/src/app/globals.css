@@ -114,7 +114,7 @@ body {
 
 .btn-immutable-tiny-inverted {
   color: #0d0d0d;
-  background-color: transparent;
+  background-color: white;
   border: 2px solid #0d0d0d;
   border-radius: 48px;
   min-width: 100px;
