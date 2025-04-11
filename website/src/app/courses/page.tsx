@@ -16,51 +16,48 @@ interface Course {
 }
 
 export default function CoursesPage() {
-  const { courses, initializeCourses } = useLessonStore();
-  const [loading, setLoading] = useState(true);
+  const { courses, initializeCourses, userProgress } = useLessonStore();
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Fetch the latest courses data to ensure it's up to date
   useEffect(() => {
-    async function fetchCourses() {
+    async function fetchLatestCourses() {
       try {
-        setLoading(true);
+        setIsLoading(true);
         
-        // Add cache-busting query parameter to force fresh data
-        const response = await fetch(`/api/courses?t=${Date.now()}`);
+        // Fetch fresh course data
+        const response = await fetch('/api/courses');
         
         if (!response.ok) {
-          throw new Error('Failed to fetch courses');
+          throw new Error('Failed to fetch updated courses');
         }
         
         const data = await response.json();
-        // Always initialize with fresh data
-        initializeCourses(data.courses);
+        
+        // Update the completed status for each lesson based on userProgress
+        const updatedCourses = data.courses.map((course: Course) => ({
+          ...course,
+          lessons: course.lessons.map((lesson: any) => ({
+            ...lesson,
+            completed: userProgress.completedLessons[lesson.id] || false
+          }))
+        }));
+        
+        // Update the global store
+        initializeCourses(updatedCourses);
+        
       } catch (err) {
-        console.error('Error fetching courses:', err);
-        setError('Failed to load courses. Please try again later.');
+        console.error('Error refreshing course data:', err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
     
-    // Always fetch fresh data
-    fetchCourses();
-    
-    // Set up automatic refresh when the component becomes visible
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        fetchCourses();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [initializeCourses]);
+    fetchLatestCourses();
+  }, [initializeCourses, userProgress.completedLessons]);
   
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-6 flex justify-center items-center h-64">
         <div className="text-center">
@@ -120,8 +117,23 @@ export default function CoursesPage() {
               <h2 className="text-xl font-bold mb-2 text-gray-900">{course.title}</h2>
               <p className="text-gray-600 mb-4">{course.description}</p>
               <div className="flex justify-between items-center mb-4">
-                <div className="text-sm text-gray-500">
-                  {course.lessons.length} {course.lessons.length === 1 ? 'lesson' : 'lessons'}
+                <div className="text-sm text-gray-500 flex items-center">
+                  {course.lessons.some((lesson: any) => lesson.completed) ? (
+                    <div className="flex items-center">
+                      <div className="bg-green-600 text-white w-6 h-6 rounded-full flex items-center justify-center mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <span>
+                        {course.lessons.filter((lesson: any) => lesson.completed).length} of {course.lessons.length} completed
+                      </span>
+                    </div>
+                  ) : (
+                    <span>
+                      {course.lessons.length} {course.lessons.length === 1 ? 'lesson' : 'lessons'}
+                    </span>
+                  )}
                 </div>
                 {course.difficulty && (
                   <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
@@ -133,7 +145,7 @@ export default function CoursesPage() {
                 href={`/courses/${course.id}`}
                 className="btn-immutable-sm-gradient w-full block text-center"
               >
-                Start Learning
+                {course.lessons.some((lesson: any) => lesson.completed) ? 'Continue Learning' : 'Start Learning'}
               </Link>
             </div>
           </div>

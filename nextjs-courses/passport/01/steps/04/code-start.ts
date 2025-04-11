@@ -1,31 +1,29 @@
-// src/app/auth/callback/page.tsx
-'use client';
+import { config, passport } from '@imtbl/sdk';
+import { BrowserProvider } from 'ethers';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { passportClient } from '../../lib/passportClient';
+const imtblConfig = {
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: '4567-8901-2345-6789',
+  },
+  clientId: '1234-5678-9012-3456',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact'
+}; 
 
-export default function AuthCallback() {
-  const router = useRouter();
+// Initialize the Passport client with the configuration
+const passportClient = new passport.Passport(imtblConfig);
 
-  useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        // TODO: Process the authentication callback
-        // Hint: Use the passportClient.loginCallback() method
-        
-        // TODO: Redirect to the dashboard after successful login
-        // Hint: Use router.push('/dashboard')
-      } catch (error) {
-        console.error('Authentication error:', error);
-        // Redirect to login page with error
-        router.push('/login?error=auth_failed');
-      }
-    };
+const connectEvm = async () => {
+  const passportProvider = await passportClient.connectEvm();
+  const web3Provider = new BrowserProvider(passportProvider);
+  const accounts = await web3Provider.send('eth_requestAccounts', []);
+  console.log(accounts);
+};
 
-    handleCallback();
-  }, [router]);
+connectEvm();
 
-  // TODO: Return a loading UI component
-  return null;
-} 
+// Send a transaction
+

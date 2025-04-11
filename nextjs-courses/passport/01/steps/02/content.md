@@ -6,15 +6,20 @@ In this step, we'll focus specifically on configuring the Passport instance for 
 
 Passport requires specific configuration options to function correctly. Let's go through each option in detail:
 
-### Environment
+### Base Configuration
 
-The `environment` option determines which Immutable environment your application will connect to:
+The `baseConfig` object contains core configuration settings for connecting to Immutable's services:
 
-- `SANDBOX`: Use this for development and testing. It connects to Immutable's sandbox environment where you can test features without using real assets.
-- `PRODUCTION`: Use this for your live application. It connects to Immutable's production environment where real transactions occur.
+- `environment`: Determines which Immutable environment your application will connect to:
+  - `SANDBOX`: Use this for development and testing. It connects to Immutable's sandbox environment where you can test features without using real assets.
+  - `PRODUCTION`: Use this for your live application. It connects to Immutable's production environment where real transactions occur.
+- `publishableKey`: A public key that identifies your application to Immutable's services. This is different from your client ID and is used for certain API operations.
 
 ```typescript
-environment: config.Environment.SANDBOX // or config.Environment.PRODUCTION
+baseConfig: {
+  environment: config.Environment.SANDBOX, // or config.Environment.PRODUCTION
+  publishableKey: process.env.NEXT_PUBLIC_IMMUTABLE_PUBLISHABLE_KEY as string
+}
 ```
 
 ### Client ID
@@ -80,7 +85,7 @@ scope: 'openid offline_access email transact'
 
 ## Your Code Challenge
 
-Complete the configuration by setting up the `imtblConfig.ts` file with all the required configuration options for the Passport client. Make sure to include all the properties we've discussed: environment, clientId, redirectUri, logoutRedirectUri, audience, and scope.
+Complete the configuration by setting up the `imtblConfig.ts` file with all the required configuration options for the Passport client. Make sure to include all the properties we've discussed: baseConfig (with environment and publishableKey), clientId, redirectUri, logoutRedirectUri, audience, and scope.
 
 ## Next Steps
 

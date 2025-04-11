@@ -112,6 +112,25 @@ body {
   letter-spacing: 0.02em;
 }
 
+.btn-immutable-tiny-inverted {
+  color: #0d0d0d;
+  background-color: transparent;
+  border: 2px solid #0d0d0d;
+  border-radius: 48px;
+  min-width: 100px;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 12px;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+
 .btn-immutable-sm-inverted {
   color: #0d0d0d;
   background-color: transparent;

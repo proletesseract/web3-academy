@@ -9,10 +9,10 @@ import Image from 'next/image';
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const courseId = params.courseId as string;
+  const courseId = params?.courseId as string || '';
   const [isLoading, setIsLoading] = useState(true);
   
-  const { getCourseById, setCurrentLesson, initializeCourses } = useLessonStore();
+  const { getCourseById, setCurrentLesson, initializeCourses, userProgress } = useLessonStore();
   const [course, setCourse] = useState<any>(null);
   
   // Fetch the latest courses data to ensure it's up to date
@@ -35,19 +35,35 @@ export default function CourseDetailPage() {
         
         // Find the current course in the fresh data
         const updatedCourse = data.courses.find((c: any) => c.id === courseId);
+        
+        // Update the completed status for each lesson based on userProgress
+        if (updatedCourse) {
+          updatedCourse.lessons = updatedCourse.lessons.map((lesson: any) => ({
+            ...lesson,
+            completed: userProgress.completedLessons[lesson.id] || false
+          }));
+        }
+        
         setCourse(updatedCourse);
         
       } catch (err) {
         console.error('Error refreshing course data:', err);
         // Fallback to store data if API fails
-        setCourse(getCourseById(courseId));
+        const fallbackCourse = getCourseById(courseId);
+        if (fallbackCourse) {
+          fallbackCourse.lessons = fallbackCourse.lessons.map((lesson: any) => ({
+            ...lesson,
+            completed: userProgress.completedLessons[lesson.id] || false
+          }));
+        }
+        setCourse(fallbackCourse);
       } finally {
         setIsLoading(false);
       }
     }
     
     fetchLatestCourses();
-  }, [courseId, getCourseById, initializeCourses]);
+  }, [courseId, getCourseById, initializeCourses, userProgress.completedLessons]);
   
   // Show loading state during hydration to prevent mismatch
   if (isLoading) {
@@ -113,34 +129,60 @@ export default function CourseDetailPage() {
       <div className="mb-6">
         <h2 className="text-2xl font-bold mb-4 text-white">Lessons</h2>
         <div className="space-y-4">
-          {course.lessons.map((lesson: any, index: number) => (
-            <div 
-              key={lesson.id} 
-              className="bg-white p-6 rounded-lg shadow-md"
-            >
-              <div className="flex items-center mb-2">
-                <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">
-                  {index + 1}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{lesson.title}</h3>
-              </div>
-              
-              <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
-              
-              <div className="ml-11 flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  {lesson.steps.length} {lesson.steps.length === 1 ? 'step' : 'steps'}
+          {course.lessons.map((lesson: any, index: number) => {
+            // Check if this lesson has prerequisites that haven't been completed
+            const hasUncompletedPrerequisites = index > 0 && 
+              !course.lessons.slice(0, index).every((prevLesson: any) => prevLesson.completed);
+            
+            return (
+              <div 
+                key={lesson.id} 
+                className={`bg-white p-6 rounded-lg shadow-md ${hasUncompletedPrerequisites ? 'opacity-60' : ''}`}
+              >
+                <div className="flex items-center mb-2">
+                  {lesson.completed ? (
+                    <div className="bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                      {index + 1}
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold text-gray-900">{lesson.title}</h3>
                 </div>
                 
-                <button
-                  onClick={() => handleStartLesson(lesson.id)}
-                  className={lesson.completed ? "btn-immutable-gradient" : "btn-immutable-sm-gradient"}
-                >
-                  {lesson.completed ? 'Continue' : 'Start Lesson'}
-                </button>
+                <p className="text-gray-600 mb-4 ml-11">{lesson.description}</p>
+                
+                <div className="ml-11 flex items-center justify-between">
+                  <div className="text-sm text-gray-500">
+                    {lesson.steps.length} {lesson.steps.length === 1 ? 'step' : 'steps'}
+                    {hasUncompletedPrerequisites && (
+                      <span className="ml-2 text-amber-600">
+                        (Complete previous lessons first)
+                      </span>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handleStartLesson(lesson.id)}
+                    disabled={hasUncompletedPrerequisites}
+                    className={
+                      hasUncompletedPrerequisites 
+                        ? "btn-immutable-sm-disabled" 
+                        : lesson.completed 
+                          ? "btn-immutable-sm-inverted" 
+                          : "btn-immutable-sm-gradient"
+                    }
+                  >
+                    {lesson.completed ? 'Restart Lesson' : 'Start Lesson'}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

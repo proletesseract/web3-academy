@@ -1,22 +1,13 @@
 import { config } from '@imtbl/sdk';
 
-// Complete Passport configuration with all required properties
-export const imtblConfig = {
-  // Environment: SANDBOX for development, PRODUCTION for live apps
-  environment: config.Environment.SANDBOX,
-  
-  // Client ID from your Immutable application registration
-  clientId: process.env.NEXT_PUBLIC_IMMUTABLE_CLIENT_ID as string,
-  
-  // Where users will be redirected after authentication
-  redirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_REDIRECT_URI as string,
-  
-  // Where users will be redirected after logout
-  logoutRedirectUri: process.env.NEXT_PUBLIC_IMMUTABLE_LOGOUT_REDIRECT_URI as string,
-  
-  // Audience for Passport authentication
+const imtblConfig = {
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: '4567-8901-2345-6789',
+  },
+  clientId: '1234-5678-9012-3456',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
   audience: 'platform_api',
-  
-  // Required permissions for the application
   scope: 'openid offline_access email transact'
 }; 

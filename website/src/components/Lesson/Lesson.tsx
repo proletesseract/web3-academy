@@ -78,6 +78,9 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
   const [windowHeight, setWindowHeight] = useState(0);
   const [initialized, setInitialized] = useState(false);
   
+  // Add a resetKey state to force CodeEditor to reload
+  const [resetKey, setResetKey] = useState(0);
+  
   // Get stored checklist completion status from localStorage or default to empty object
   const [checklistsCompleted, setChecklistsCompleted] = useState<Record<string, boolean>>(() => {
     const storedChecklists = localStorage.getItem(`lesson-${lesson.id}-checklists`);
@@ -177,11 +180,14 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
         
       case '03':
         // For step 3, check for Passport initialization
-        return code.includes('new Passport') && code.includes('imtblConfig');
+        return code.includes('passport.Passport') && code.includes('imtblConfig');
         
       case '04':
-        // For step 4, check for loginCallback and router.push
-        return code.includes('loginCallback') && code.includes('router.push');
+        // For step 4, check for NFT transfer functionality
+        return code.includes('connectEvm') && 
+               code.includes('BrowserProvider') && 
+               code.includes('Contract') && 
+               code.includes('safeTransferFrom');
         
       default:
         // Default validation - normalize whitespace and compare
@@ -202,6 +208,24 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
       const updatedStepCompleted = { ...stepCompleted };
       delete updatedStepCompleted[stepId];
       setStepCompleted(updatedStepCompleted);
+    }
+  };
+  
+  // Function to reset the code editor to its starting state
+  const resetCodeEditor = () => {
+    if (currentStep.codeChallenge) {
+      // Remove the current step's code from the codeByStep state
+      const updatedCodeByStep = { ...codeByStep };
+      delete updatedCodeByStep[currentStep.id];
+      setCodeByStep(updatedCodeByStep);
+      
+      // Remove the completion status for this step
+      const updatedStepCompleted = { ...stepCompleted };
+      delete updatedStepCompleted[currentStep.id];
+      setStepCompleted(updatedStepCompleted);
+      
+      // Increment the resetKey to force the CodeEditor to reload
+      setResetKey(prevKey => prevKey + 1);
     }
   };
   
@@ -347,6 +371,18 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
           <h2 className="text-2xl font-bold mb-4 text-gray-900">{currentStep.title}</h2>
         )}
         
+        {/* Reset button for code editor */}
+        {hasRealCodeChallenge(currentStep) && (
+          <div className="flex justify-end mb-2" style={{ position: 'absolute', right: '40px', marginTop: '-9px' }}>
+            <button
+              onClick={resetCodeEditor}
+              className="btn-immutable-tiny-inverted"
+            >
+              Reset Code
+            </button>
+          </div>
+        )}
+        
         {/* don't change this height */}
         <div className="flex flex-col lg:flex-row gap-6" style={{ height: `calc(100vh - 445px)` }}>
           {/* Left side: Instructions/Content */}
@@ -391,6 +427,7 @@ const Lesson: React.FC<LessonProps> = ({ lesson, onComplete }) => {
               <h3 className="text-xl font-semibold mb-2">Code Challenge</h3>
               <div className="flex-grow" style={{ height: 'calc(100% - 32px)' }}>
                 <CodeEditor 
+                  key={`${currentStep.id}-${resetKey}`}
                   defaultValue={codeByStep[currentStep.id] || currentStep.codeChallenge!.defaultCode}
                   language={currentStep.codeChallenge!.language || 'typescript'}
                   onChange={(code) => handleCodeChange(currentStep.id, code)}

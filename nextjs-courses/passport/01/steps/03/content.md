@@ -1,221 +1,62 @@
-# Creating a Passport Client
+# Creating a Passport Client and Implementing Login
 
-Now that we have our configuration set up, we'll create a Passport client to handle authentication in our Next.js application.
+In this step, we'll create a Passport client using the configuration we set up in the previous step, and then implement the login flow using the Ethereum provider.
 
 ## Understanding the Passport Client
 
 The Passport client is the main interface for interacting with Immutable Passport services. It provides methods for:
 
-- Logging in and out
-- Retrieving user information
-- Managing authentication tokens
+- Connecting to the Ethereum network
+- Managing user authentication
 - Accessing the user's wallet
+- Handling transactions
 
-## Creating a Passport Service
+## Creating the Passport Client
 
-Let's create a service file that will initialize and provide access to the Passport client throughout our application.
+To create a Passport client, you'll need to:
 
-Create a new file called `passportService.ts` in your project's `src/lib` directory:
+1. Import the necessary modules:
+   - `passport` from `@imtbl/sdk` to access the Passport client
+   - `BrowserProvider` from `ethers` to create an Ethereum-compatible provider
 
-```typescript
-// src/lib/passportService.ts
-import { passport } from '@imtbl/sdk';
-import { imtblConfig } from './imtblConfig';
+2. Use the configuration object we created in the previous step to initialize the Passport client.
 
-let passportInstance: passport.Passport | null = null;
+3. Create a new instance of the Passport client using the `new passport.Passport()` constructor, passing in your configuration.
 
-// Function to initialize the Passport client
-export function initializePassport(): passport.Passport {
-  if (!passportInstance) {
-    passportInstance = new passport.Passport({
-      baseConfig: {
-        environment: imtblConfig.environment,
-      },
-      clientId: imtblConfig.clientId,
-      redirectUri: imtblConfig.redirectUri,
-      logoutRedirectUri: imtblConfig.logoutRedirectUri,
-      audience: imtblConfig.audience,
-      scope: imtblConfig.scope,
-    });
-  }
-  
-  return passportInstance;
-}
+## Connecting to Ethereum and Triggering Login
 
-// Function to get the existing Passport instance
-export function getPassport(): passport.Passport {
-  if (!passportInstance) {
-    return initializePassport();
-  }
-  return passportInstance;
-}
+To connect to Ethereum and trigger the Passport login popup, you'll need to implement a function that:
 
-// Helper functions for common Passport operations
-export async function getUserInfo() {
-  const passport = getPassport();
-  try {
-    return await passport.getUserInfo();
-  } catch (error) {
-    console.error('Error getting user info:', error);
-    return null;
-  }
-}
+1. Gets a Passport provider using the `connectEvm()` method on your Passport client instance
+2. Converts this provider to an ethers-compatible BrowserProvider
+3. Calls the `eth_requestAccounts` method on the BrowserProvider to trigger the login popup
 
-export async function getAccessToken() {
-  const passport = getPassport();
-  try {
-    return await passport.getAccessToken();
-  } catch (error) {
-    console.error('Error getting access token:', error);
-    return null;
-  }
-}
+## How This Works
 
-export async function isAuthenticated(): Promise<boolean> {
-  try {
-    const token = await getAccessToken();
-    return !!token;
-  } catch {
-    return false;
-  }
-}
-```
+1. **Passport Provider**: The `connectEvm()` method returns a provider that implements the Ethereum JSON-RPC API. This provider is specifically designed to work with Passport.
 
-This service implements the singleton pattern to ensure we only have one Passport instance throughout our application.
+2. **BrowserProvider**: We wrap the Passport provider in an ethers `BrowserProvider` to make it compatible with ethers.js, which provides a more convenient interface for interacting with Ethereum.
 
-## React Context for Passport
+3. **eth_requestAccounts**: This is a standard Ethereum JSON-RPC method that requests the user to connect their wallet. When called with a Passport provider, it triggers the Passport login popup.
 
-To make the Passport client easily accessible in our React components, let's create a React context.
+4. **Login Flow**: When the user interacts with the popup, they can either:
+   - Log in with an existing Passport account
+   - Create a new Passport account
+   - Connect an existing wallet
 
-Create a new file called `PassportContext.tsx` in your project's `src/context` directory:
-
-```typescript
-// src/context/PassportContext.tsx
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { passport } from '@imtbl/sdk';
-import { getPassport, getUserInfo, isAuthenticated } from '../lib/passportService';
-
-interface PassportContextType {
-  passport: passport.Passport | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  userInfo: any | null; // Replace with proper type once you know the structure
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  refreshUserInfo: () => Promise<void>;
-}
-
-const PassportContext = createContext<PassportContextType>({
-  passport: null,
-  isAuthenticated: false,
-  isLoading: true,
-  userInfo: null,
-  login: async () => {},
-  logout: async () => {},
-  refreshUserInfo: async () => {},
-});
-
-export const usePassport = () => useContext(PassportContext);
-
-export function PassportProvider({ children }: { children: ReactNode }) {
-  const [passportInstance, setPassportInstance] = useState<passport.Passport | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState<any | null>(null);
-
-  // Initialize Passport on component mount
-  useEffect(() => {
-    const init = async () => {
-      const instance = getPassport();
-      setPassportInstance(instance);
-      
-      const authenticated = await isAuthenticated();
-      setIsLoggedIn(authenticated);
-      
-      if (authenticated) {
-        const userInformation = await getUserInfo();
-        setUserInfo(userInformation);
-      }
-      
-      setIsLoading(false);
-    };
-    
-    init();
-  }, []);
-
-  const login = async () => {
-    if (!passportInstance) return;
-    try {
-      await passportInstance.login();
-      setIsLoggedIn(true);
-      await refreshUserInfo();
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
-
-  const logout = async () => {
-    if (!passportInstance) return;
-    try {
-      await passportInstance.logout();
-      setIsLoggedIn(false);
-      setUserInfo(null);
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-  const refreshUserInfo = async () => {
-    if (!passportInstance) return;
-    try {
-      const info = await getUserInfo();
-      setUserInfo(info);
-    } catch (error) {
-      console.error('Failed to refresh user info:', error);
-    }
-  };
-
-  return (
-    <PassportContext.Provider
-      value={{
-        passport: passportInstance,
-        isAuthenticated: isLoggedIn,
-        isLoading,
-        userInfo,
-        login,
-        logout,
-        refreshUserInfo,
-      }}
-    >
-      {children}
-    </PassportContext.Provider>
-  );
-}
-```
-
-## Adding the Provider to Your Application
-
-Finally, wrap your application with the PassportProvider in your `_app.tsx` file:
-
-```typescript
-// src/pages/_app.tsx or src/app/layout.tsx
-import { PassportProvider } from '../context/PassportContext';
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <PassportProvider>
-      <Component {...pageProps} />
-    </PassportProvider>
-  );
-}
-
-export default MyApp;
-```
+5. **Accounts**: After successful authentication, the `eth_requestAccounts` call returns an array of the user's Ethereum addresses.
 
 ## Your Code Challenge
 
-Implement the Passport client initialization in the `passportService.ts` file. Make sure you correctly configure the Passport instance using the configuration options from the previous step.
+Complete the implementation by:
+
+1. Importing the necessary modules (`passport` from `@imtbl/sdk` and `BrowserProvider` from `ethers`)
+2. Creating the Passport client with the provided configuration
+3. Implementing a function that:
+   - Gets the Passport provider using `connectEvm()`
+   - Converts it to a BrowserProvider
+   - Calls `eth_requestAccounts` to trigger the login popup
 
 ## Next Steps
 
-In the next step, we'll implement the login functionality using the Passport client we just created. 
+In the next step, we'll implement a more complete authentication flow with proper error handling and user state management. 

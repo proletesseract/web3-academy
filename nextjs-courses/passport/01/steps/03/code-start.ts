@@ -1,6 +1,15 @@
-// src/lib/passportClient.ts
-import { Passport } from '@imtbl/sdk';
-import { imtblConfig } from './imtblConfig';
+import { config } from '@imtbl/sdk';
 
-// TODO: Initialize the Passport client with the configuration
-// Hint: Create a new Passport instance with the imtblConfig 
+const imtblConfig = {
+  baseConfig: {
+    environment: config.Environment.SANDBOX,
+    publishableKey: '4567-8901-2345-6789',
+  },
+  clientId: '1234-5678-9012-3456',
+  redirectUri: 'http://localhost:3000/redirect',
+  logoutRedirectUri: 'http://localhost:3000/logout',
+  audience: 'platform_api',
+  scope: 'openid offline_access email transact'
+}; 
+
+// Initialize the Passport client and trigger the login popup

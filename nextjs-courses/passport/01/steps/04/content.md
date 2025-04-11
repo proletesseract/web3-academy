@@ -1,210 +1,77 @@
-# Implementing User Login
+# Implementing NFT Transfer Functionality
 
-Now that we have created our Passport service and context, let's implement the login functionality in our Next.js application.
+In this step, we'll implement the functionality to transfer an NFT using the Passport SDK. This involves connecting to the Ethereum Virtual Machine (EVM), setting up the necessary providers, and executing the transfer transaction.
 
-## Creating a Login Button Component
+## Understanding the Components
 
-First, let's create a reusable login button component that will handle the login process:
+Before we start coding, let's understand the key components we'll be working with:
 
-```typescript
-// src/components/LoginButton.tsx
-import { usePassport } from '../context/PassportContext';
+### Ethereum Provider Setup
 
-export function LoginButton() {
-  const { login, isAuthenticated, isLoading, userInfo } = usePassport();
+To interact with the Ethereum blockchain, we need to set up two providers:
+1. A Passport provider that handles authentication and transaction signing
+2. A Web3 provider that interfaces with the Ethereum network
 
-  const handleLogin = () => {
-    login();
-  };
+### NFT Transfer Requirements
 
-  if (isLoading) {
-    return <button disabled>Loading...</button>;
-  }
+To transfer an NFT, we need:
+1. The contract address of the NFT (ERC721 token)
+2. The token ID of the specific NFT we want to transfer
+3. The recipient's Ethereum address
 
-  if (isAuthenticated) {
-    return (
-      <div>
-        <p>Logged in as: {userInfo?.email || 'User'}</p>
-      </div>
-    );
-  }
+## Implementation Steps
 
-  return (
-    <button
-      onClick={handleLogin}
-      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-    >
-      Login with Immutable
-    </button>
-  );
-}
-```
+### 1. Connect to the EVM
 
-## Creating a Callback Page
+First, we need to establish a connection to the Ethereum Virtual Machine using the Passport client. This will:
+- Create a provider that can sign transactions
+- Handle the authentication flow
+- Manage the connection state
 
-When a user logs in with Passport, they will be redirected back to your application at the redirect URI you specified in your configuration. We need to create a callback page to handle this redirect:
+### 2. Set Up the Web3 Provider
 
-```typescript
-// src/pages/callback.tsx or src/app/callback/page.tsx
-'use client'; // If using App Router
+After connecting to the EVM, we need to create a Web3 provider that will:
+- Interface with the Ethereum network
+- Allow us to send transactions
+- Handle blockchain interactions
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router'; // or 'next/navigation' for App Router
-import { usePassport } from '../context/PassportContext';
+### 3. Prepare the Transfer Parameters
 
-export default function CallbackPage() {
-  const router = useRouter();
-  const { passport, refreshUserInfo } = usePassport();
-  const [error, setError] = useState<string | null>(null);
+Before executing the transfer, we need to:
+- Define the recipient's address
+- Specify the NFT contract address
+- Identify the token ID to transfer
 
-  useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        if (!passport) {
-          throw new Error('Passport not initialized');
-        }
+### 4. Execute the Transfer
 
-        // Handle the callback from Immutable Passport
-        await passport.loginCallback();
-        
-        // Refresh user info after successful login
-        await refreshUserInfo();
-        
-        // Redirect to home page or dashboard
-        router.push('/');
-      } catch (err) {
-        console.error('Login callback error:', err);
-        setError('Failed to complete login. Please try again.');
-      }
-    };
-
-    handleCallback();
-  }, [passport, refreshUserInfo, router]);
-
-  if (error) {
-    return (
-      <div className="p-4">
-        <h1 className="text-xl font-bold mb-4">Authentication Error</h1>
-        <p className="text-red-500">{error}</p>
-        <button 
-          onClick={() => router.push('/')}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Return Home
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Logging you in...</h1>
-      <p>Please wait while we complete your authentication.</p>
-    </div>
-  );
-}
-```
-
-## Creating a User Profile Component
-
-Let's also create a component to display user information after a successful login:
-
-```typescript
-// src/components/UserProfile.tsx
-import { usePassport } from '../context/PassportContext';
-
-export function UserProfile() {
-  const { userInfo, logout, isAuthenticated, isLoading } = usePassport();
-
-  if (isLoading) {
-    return <div>Loading user information...</div>;
-  }
-
-  if (!isAuthenticated || !userInfo) {
-    return <div>Not logged in</div>;
-  }
-
-  return (
-    <div className="bg-white shadow rounded p-4 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Your Profile</h2>
-      
-      <div className="mb-4">
-        <p><strong>Email:</strong> {userInfo.email || 'Not available'}</p>
-        <p><strong>User ID:</strong> {userInfo.sub || 'Not available'}</p>
-      </div>
-      
-      {userInfo.nickname && (
-        <p><strong>Nickname:</strong> {userInfo.nickname}</p>
-      )}
-      
-      <button
-        onClick={logout}
-        className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-      >
-        Logout
-      </button>
-    </div>
-  );
-}
-```
-
-## Using the Components in a Page
-
-Now, let's update our home page to use these components:
-
-```typescript
-// src/pages/index.tsx or src/app/page.tsx
-'use client'; // If using App Router
-
-import { LoginButton } from '../components/LoginButton';
-import { UserProfile } from '../components/UserProfile';
-import { usePassport } from '../context/PassportContext';
-
-export default function HomePage() {
-  const { isAuthenticated, isLoading } = usePassport();
-
-  return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Immutable Passport Demo</h1>
-      
-      <div className="mb-8">
-        <LoginButton />
-      </div>
-      
-      {!isLoading && isAuthenticated && (
-        <div className="mt-8">
-          <UserProfile />
-        </div>
-      )}
-    </div>
-  );
-}
-```
-
-## Testing the Login Flow
-
-To test the login flow:
-
-1. Start your Next.js development server: `npm run dev`
-2. Navigate to your home page at http://localhost:3000
-3. Click the "Login with Immutable" button
-4. You will be redirected to the Immutable Passport login page
-5. After logging in, you'll be redirected back to your application's callback page
-6. If everything is configured correctly, you should be redirected to your home page and see your user information
+Finally, we'll implement the transfer function that will:
+- Create the transfer transaction
+- Sign it with the user's wallet
+- Send it to the blockchain
+- Handle the response
 
 ## Your Code Challenge
 
-Implement the login callback handling in the callback page. Make sure you correctly handle the redirect from Immutable Passport after a user logs in.
+Complete the implementation by:
+1. Setting up the necessary imports from the Passport SDK and ethers.js
+2. Creating the connection to the EVM
+3. Setting up the Web3 provider
+4. Implementing the transfer function
+5. Handling the transaction response
 
-## Congratulations!
+Make sure to:
+- Use proper error handling
+- Validate input parameters
+- Provide feedback to the user about the transaction status
 
-You've successfully integrated Immutable Passport into your Next.js application! Users can now log in, view their profile information, and log out.
+## Testing Your Implementation
 
-## Next Steps
+Once you've completed the implementation, you can test it by:
+1. Connecting your wallet
+2. Attempting to transfer an NFT
+3. Verifying the transaction on the blockchain explorer
+4. Checking the recipient's wallet for the transferred NFT
 
-Here are some additional features you might want to implement:
+## Lesson Complete
 
-- Add protected routes that only authenticated users can access
-- Implement wallet functionality to allow users to make transactions
-- Add error handling and loading states for a better user experience
-- Set up persistent sessions so users remain logged in when they return to your application 
+This is the end of the first Immutable Passport lesson. Now you know how to configure Passport, login and send an NFT. You are well on your way to becoming a Web3 developer on Immutable&nbsp;zkEVM.
