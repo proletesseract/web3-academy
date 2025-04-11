@@ -1,6 +1,6 @@
 # Immutable Academy
 
-![Immutable Academy](website/public/images/immutable-academy-logo.png)
+![Immutable Academy](website/public/images/immutable-card.jpg)
 
 ## Overview
 
