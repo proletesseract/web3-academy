@@ -16,49 +16,121 @@ export default function LessonPage() {
   const lessonId = params?.lessonId as string || '';
   const [isLoading, setIsLoading] = useState(true);
   const [courseId, setCourseId] = useState<string | null>(null);
+  const [lessonData, setLessonData] = useState<any>(null);
   
-  const { getLessonById, markLessonAsCompleted } = useLessonStore();
-  const lesson = getLessonById(lessonId);
+  const { getLessonById, markLessonAsCompleted, initializeCourses } = useLessonStore();
   
-  // Find the course this lesson belongs to
+  // Find the course this lesson belongs to and fetch fresh lesson data
   useEffect(() => {
     // Force rehydrate the lesson data when the component loads
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+        
         // Call the revalidation API first
         await fetch(`/api/revalidate?path=/lessons/${lessonId}`, { 
           cache: 'no-store'
         });
         
-        // Then fetch the lesson data
-        const response = await fetch(`/api/lessons/${lessonId}/refresh?_=${Date.now()}`, { 
+        // Fetch fresh courses data to update the store
+        const coursesResponse = await fetch(`/api/courses?_=${Date.now()}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache'
           }
         });
         
-        // Even if the fetch fails, we'll still try to get the course from the store
-        console.log('Refreshed lesson data from server');
+        if (coursesResponse.ok) {
+          const coursesData = await coursesResponse.json();
+          // Update the global store with fresh data
+          initializeCourses(coursesData.courses);
+          
+          // Find the lesson in the fresh data
+          let foundLesson = null;
+          let foundCourseId = null;
+          
+          for (const course of coursesData.courses) {
+            const lesson = course.lessons.find((l: any) => l.id === lessonId);
+            if (lesson) {
+              foundLesson = lesson;
+              foundCourseId = course.id;
+              break;
+            }
+          }
+          
+          if (foundLesson) {
+            setLessonData(foundLesson);
+            setCourseId(foundCourseId);
+          } else {
+            console.error('Lesson not found in fresh data');
+          }
+        }
+        
+        // Also fetch the specific lesson data
+        const lessonResponse = await fetch(`/api/lessons/${lessonId}/refresh?_=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        if (lessonResponse.ok) {
+          const lessonData = await lessonResponse.json();
+          console.log('Refreshed lesson data from server:', lessonData);
+          
+          // If we have the manifest data, we can use it to update the lesson
+          if (lessonData.manifest) {
+            // Find the lesson in the store and update it with the fresh data
+            const { courses } = useLessonStore.getState();
+            const updatedCourses = [...courses];
+            
+            for (let i = 0; i < updatedCourses.length; i++) {
+              const course = updatedCourses[i];
+              const lessonIndex = course.lessons.findIndex((l: any) => l.id === lessonId);
+              
+              if (lessonIndex !== -1) {
+                // Update the lesson with fresh data
+                const updatedLesson = { ...course.lessons[lessonIndex] };
+                
+                // Update title and description from manifest
+                updatedLesson.title = lessonData.manifest.title;
+                updatedLesson.description = lessonData.manifest.description;
+                
+                // Update the lesson in the course
+                updatedCourses[i].lessons[lessonIndex] = updatedLesson;
+                
+                // Update the store
+                initializeCourses(updatedCourses);
+                
+                // Update the local state
+                setLessonData(updatedLesson);
+                setCourseId(course.id);
+                break;
+              }
+            }
+          }
+        }
       } catch (error) {
         console.log('Error refreshing lesson data:', error);
-      }
-      
-      const { courses } = useLessonStore.getState();
-      
-      // Find the course that contains this lesson
-      for (const course of courses) {
-        if (course.lessons.some(l => l.id === lessonId)) {
-          setCourseId(course.id);
-          break;
+        // Fallback to store data if API fails
+        const lesson = getLessonById(lessonId);
+        setLessonData(lesson);
+        
+        // Find the course that contains this lesson
+        const { courses } = useLessonStore.getState();
+        for (const course of courses) {
+          if (course.lessons.some(l => l.id === lessonId)) {
+            setCourseId(course.id);
+            break;
+          }
         }
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     
     fetchData();
-  }, [lessonId]);
+  }, [lessonId, getLessonById, initializeCourses]);
   
   // Show loading state during hydration to prevent mismatch
   if (isLoading) {
@@ -72,7 +144,7 @@ export default function LessonPage() {
     );
   }
   
-  if (!lesson) {
+  if (!lessonData) {
     return (
       <div className="max-w-screen-2xl mx-auto">
         <div className="p-4">
@@ -117,7 +189,7 @@ export default function LessonPage() {
         </Link>
       </div>
       <Lesson 
-        lesson={lesson} 
+        lesson={lessonData} 
         onComplete={handleLessonComplete}
       />
     </div>
