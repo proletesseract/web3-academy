@@ -8,7 +8,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-6 text-center">
       <h1 className="text-5xl font-bold mb-6 gradient-text">Immutable Academy</h1>
       <p className="text-xl max-w-3xl mb-10 text-gray-300">
-        Learn how to build on Immutable X with our interactive tutorials.
+        Learn how to build on Immutable zkEVM with our interactive tutorials.
         Master blockchain development through hands-on coding exercises and quizzes.
       </p>
       
@@ -40,7 +40,7 @@ export default function Home() {
         <div className="p-6 bg-white rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-3 text-gray-900">Real-World Projects</h2>
           <p className="text-gray-600">
-            Build practical projects that demonstrate how to implement Immutable X in your applications.
+            Build practical projects that demonstrate how to implement Immutable zkEVM in your applications.
           </p>
         </div>
         
