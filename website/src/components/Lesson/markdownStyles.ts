@@ -1,0 +1,16 @@
+export const markdownStyles = {
+  p: 'text-gray-800 text-base leading-relaxed mb-4',
+  h1: 'text-2xl font-bold text-gray-900 mb-4 mt-6',
+  h2: 'text-xl font-bold text-gray-900 mb-3 mt-5',
+  h3: 'text-lg font-semibold text-gray-900 mb-3 mt-4',
+  h4: 'text-base font-semibold text-gray-900 mb-2 mt-4',
+  ul: 'list-disc pl-5 mb-4 text-gray-800',
+  ol: 'list-decimal pl-5 mb-4 text-gray-800',
+  li: 'mb-1 text-gray-800',
+  a: 'text-blue-600 hover:underline',
+  blockquote: 'border-l-4 border-gray-200 pl-4 italic my-4 text-gray-800',
+  code: 'bg-gray-100 px-1 py-0.5 rounded text-gray-800 font-mono text-sm',
+  pre: 'bg-gray-100 p-4 rounded-md overflow-auto my-4 text-gray-800',
+  strong: 'font-semibold text-gray-900',
+  em: 'italic text-gray-800',
+}; 
